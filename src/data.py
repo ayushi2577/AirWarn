@@ -1,7 +1,7 @@
 """
 load_raw: reads the CSV and sorts it by city and date.
 make_explicit_calendar: guarantees one row per city per day. Data check says none are missing, but this makes the code safe anyway.
-add_target: finds tomorrow’s AQI by date and marks which rows are usable (is_eval). It doesn’t delete anything yet, because lags and rolling means in features.py need the blank days too. We filter to is_eval only when training and scoring.
+add_target: adds 2 column poor_tomorrow and is_eval ... finds tomorrow’s AQI by date and marks which rows are usable (is_eval). It doesn’t delete anything yet, because lags and rolling means in features.py need the blank days too. We filter to is_eval only when training and scoring.
 build_dataset: runs steps 1 to 3 in order.
 print_counts: shows the counts to compare with your proposal.
 """
@@ -66,7 +66,7 @@ def print_counts(df):
     print(ev.groupby(ev["Date"].dt.year)["poor_tomorrow"].agg(rows="count", positives="sum"))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":    # if directly ran
     data = build_dataset()
     print_counts(data)
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
