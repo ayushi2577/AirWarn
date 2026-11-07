@@ -1,0 +1,294 @@
+{
+ "validation": [
+  {
+   "city": "Delhi",
+   "rows": 716,
+   "positives": 455,
+   "precision": 0.9594594595,
+   "recall": 0.9362637363,
+   "reliable": true
+  },
+  {
+   "city": "Lucknow",
+   "rows": 725,
+   "positives": 430,
+   "precision": 0.9806094183,
+   "recall": 0.823255814,
+   "reliable": true
+  },
+  {
+   "city": "Gurugram",
+   "rows": 643,
+   "positives": 424,
+   "precision": 0.9656992084,
+   "recall": 0.8632075472,
+   "reliable": true
+  },
+  {
+   "city": "Ahmedabad",
+   "rows": 419,
+   "positives": 403,
+   "precision": 0.9727047146,
+   "recall": 0.9727047146,
+   "reliable": true
+  },
+  {
+   "city": "Patna",
+   "rows": 484,
+   "positives": 300,
+   "precision": 0.9728682171,
+   "recall": 0.8366666667,
+   "reliable": true
+  },
+  {
+   "city": "Jaipur",
+   "rows": 537,
+   "positives": 104,
+   "precision": 0.7924528302,
+   "recall": 0.4038461538,
+   "reliable": true
+  },
+  {
+   "city": "Amritsar",
+   "rows": 565,
+   "positives": 85,
+   "precision": 0.9122807018,
+   "recall": 0.6117647059,
+   "reliable": true
+  },
+  {
+   "city": "Talcher",
+   "rows": 228,
+   "positives": 77,
+   "precision": 0.9701492537,
+   "recall": 0.8441558442,
+   "reliable": true
+  },
+  {
+   "city": "Jorapokhar",
+   "rows": 282,
+   "positives": 71,
+   "precision": 0.972972973,
+   "recall": 0.5070422535,
+   "reliable": true
+  },
+  {
+   "city": "Brajrajnagar",
+   "rows": 263,
+   "positives": 70,
+   "precision": 0.9411764706,
+   "recall": 0.4571428571,
+   "reliable": true
+  },
+  {
+   "city": "Kolkata",
+   "rows": 204,
+   "positives": 65,
+   "precision": 0.9677419355,
+   "recall": 0.9230769231,
+   "reliable": true
+  },
+  {
+   "city": "Visakhapatnam",
+   "rows": 465,
+   "positives": 51,
+   "precision": 0.8235294118,
+   "recall": 0.2745098039,
+   "reliable": true
+  },
+  {
+   "city": "Amaravati",
+   "rows": 312,
+   "positives": 33,
+   "precision": 0.75,
+   "recall": 0.0909090909,
+   "reliable": true
+  },
+  {
+   "city": "Chennai",
+   "rows": 723,
+   "positives": 31,
+   "precision": 0.6666666667,
+   "recall": 0.1935483871,
+   "reliable": true
+  },
+  {
+   "city": "Bengaluru",
+   "rows": 721,
+   "positives": 10,
+   "precision": 0.5,
+   "recall": 0.1,
+   "reliable": false
+  },
+  {
+   "city": "Hyderabad",
+   "rows": 718,
+   "positives": 5,
+   "precision": 0.0,
+   "recall": 0.0,
+   "reliable": false
+  },
+  {
+   "city": "Mumbai",
+   "rows": 221,
+   "positives": 4,
+   "precision": 0.3333333333,
+   "recall": 0.25,
+   "reliable": false
+  },
+  {
+   "city": "Thiruvananthapuram",
+   "rows": 510,
+   "positives": 3,
+   "precision": 0.0,
+   "recall": 0.0,
+   "reliable": false
+  }
+ ],
+ "test_2019": [
+  {
+   "city": "Ahmedabad",
+   "rows": 346,
+   "positives": 329,
+   "precision": 0.9840764331,
+   "recall": 0.9392097264,
+   "reliable": true
+  },
+  {
+   "city": "Delhi",
+   "rows": 364,
+   "positives": 193,
+   "precision": 0.8972972973,
+   "recall": 0.8601036269,
+   "reliable": true
+  },
+  {
+   "city": "Lucknow",
+   "rows": 364,
+   "positives": 166,
+   "precision": 0.9375,
+   "recall": 0.7228915663,
+   "reliable": true
+  },
+  {
+   "city": "Patna",
+   "rows": 354,
+   "positives": 158,
+   "precision": 0.9842519685,
+   "recall": 0.7911392405,
+   "reliable": true
+  },
+  {
+   "city": "Gurugram",
+   "rows": 362,
+   "positives": 153,
+   "precision": 0.8962962963,
+   "recall": 0.7908496732,
+   "reliable": true
+  },
+  {
+   "city": "Kolkata",
+   "rows": 364,
+   "positives": 98,
+   "precision": 0.9294117647,
+   "recall": 0.806122449,
+   "reliable": true
+  },
+  {
+   "city": "Talcher",
+   "rows": 286,
+   "positives": 80,
+   "precision": 0.9516129032,
+   "recall": 0.7375,
+   "reliable": true
+  },
+  {
+   "city": "Jorapokhar",
+   "rows": 293,
+   "positives": 75,
+   "precision": 0.9423076923,
+   "recall": 0.6533333333,
+   "reliable": true
+  },
+  {
+   "city": "Brajrajnagar",
+   "rows": 300,
+   "positives": 66,
+   "precision": 0.925,
+   "recall": 0.5606060606,
+   "reliable": true
+  },
+  {
+   "city": "Visakhapatnam",
+   "rows": 325,
+   "positives": 36,
+   "precision": 0.9655172414,
+   "recall": 0.7777777778,
+   "reliable": true
+  },
+  {
+   "city": "Amritsar",
+   "rows": 358,
+   "positives": 29,
+   "precision": 1.0,
+   "recall": 0.4482758621,
+   "reliable": false
+  },
+  {
+   "city": "Amaravati",
+   "rows": 302,
+   "positives": 21,
+   "precision": 0.9444444444,
+   "recall": 0.8095238095,
+   "reliable": false
+  },
+  {
+   "city": "Mumbai",
+   "rows": 364,
+   "positives": 20,
+   "precision": 1.0,
+   "recall": 0.1,
+   "reliable": false
+  },
+  {
+   "city": "Jaipur",
+   "rows": 364,
+   "positives": 17,
+   "precision": 0.625,
+   "recall": 0.2941176471,
+   "reliable": false
+  },
+  {
+   "city": "Chennai",
+   "rows": 364,
+   "positives": 12,
+   "precision": 0.4444444444,
+   "recall": 0.3333333333,
+   "reliable": false
+  },
+  {
+   "city": "Bengaluru",
+   "rows": 364,
+   "positives": 0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "reliable": false
+  },
+  {
+   "city": "Hyderabad",
+   "rows": 364,
+   "positives": 0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "reliable": false
+  },
+  {
+   "city": "Thiruvananthapuram",
+   "rows": 346,
+   "positives": 0,
+   "precision": 0.0,
+   "recall": 0.0,
+   "reliable": false
+  }
+ ]
+}

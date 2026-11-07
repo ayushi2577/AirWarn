@@ -4,54 +4,248 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Next-Day Unhealthy Air Warning for Indian Cities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
-<header>
-  <h1>Can we warn a day ahead when a city's air will be unhealthy?</h1>
-  <p>Predicting whether tomorrow's AQI will be above 200 in 26 Indian cities, 2015 to 2020.</p>
-  <nav>
-    <a href="#question">Question</a> <a href="#data">Data</a>
-    <a href="#preprocessing">Preprocessing</a> <a href="#methods">Methods</a>
-    <a href="#evaluation">Evaluation</a> <a href="#slider">Slider</a>
-    <a href="#results">Results</a> <a href="#errors">Errors</a>
-    <a href="#limitations">Limitations</a> <a href="#conclusion">Conclusion</a>
-    <a href="#reproduce">Reproduce</a>
-  </nav>
-</header>
-<main>
-  <section id="question"><h2>Question</h2><p>TODO</p></section>
-  <section id="data"><h2>Data</h2><p>TODO</p></section>
-  <section id="preprocessing"><h2>Preprocessing</h2><p>TODO</p></section>
-  <section id="methods"><h2>Baselines and methods</h2><p>TODO</p></section>
-  <section id="evaluation"><h2>Evaluation</h2><p>TODO</p></section>
+<div id="progress"></div>
+<nav id="nav">
+  <span class="brand">&#9679; AirWarn</span>
+  <a href="#question">Question</a><a href="#data">Data</a><a href="#preprocessing">Preprocessing</a>
+  <a href="#methods">Methods</a><a href="#evaluation">Evaluation</a><a href="#slider">Slider</a>
+  <a href="#results">Results</a><a href="#timeline">Timeline</a><a href="#errors">Errors</a>
+  <a href="#limitations">Limitations</a><a href="#conclusion">Conclusion</a><a href="#reproduce">Reproduce</a>
+</nav>
 
-  <section id="slider">
-    <h2>Threshold slider</h2>
-    <p>Move the threshold to see the trade-off between catching bad-air days and false alarms.
-       These are <b>validation</b> results (2017 to 2018), for exploration only.</p>
-    <label>Model
-      <select id="model"></select>
+<header class="hero">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <p class="eyebrow">ES 335 &middot; NAME, ROLL NUMBER</p>
+  <h1>Can we warn a day ahead when a city's air will be <span class="grad">unhealthy</span>?</h1>
+  <p class="lead">Predicting whether tomorrow's AQI will be above 200 ("Poor" or worse) from past readings in 26 Indian cities, 2015&ndash;2020, and testing honestly against the rule "tomorrow = today".</p>
+  <div class="stats">
+    <div class="stat"><b data-count="24343">0</b><span>city-days used</span></div>
+    <div class="stat"><b data-count="26" data-suf="%">0</b><span>are bad-air days</span></div>
+    <div class="stat"><b data-count="6.7" data-dec="1" data-pre="+" data-suf=" pts">0</b><span>precision vs persistence at equal recall (2019 test)</span></div>
+    <div class="stat"><b data-count="10" data-suf="%">0</b><span>of clean-to-bad flips caught</span></div>
+  </div>
+  <a class="cta" href="#slider">Try the threshold slider &darr;</a>
+</header>
+
+<main>
+
+<section id="question" class="reveal">
+  <h2><i>01</i> Question</h2>
+  <p>Poor-air days harm children, older people, and people with asthma or heart disease. A one-day warning lets people stay indoors, wear masks, or reschedule outdoor activity.</p>
+  <p><b>Question:</b> using a city's readings up to the end of today, can we predict whether <b>tomorrow's</b> AQI will be above 200, better than the simple rule <i>"tomorrow will be like today"</i>?</p>
+  <p>Binary classification. <b>One row = one city on one day <i>t</i></b>; the prediction is made at the end of day <i>t</i> using only information from day <i>t</i> or earlier.</p>
+  <p class="callout"><b>Why ML if AQI is a formula?</b> The formula only turns today's readings into today's AQI. Tomorrow's readings do not exist yet when we predict, so the model must learn patterns from history.</p>
+</section>
+
+<section id="data" class="reveal">
+  <h2><i>02</i> Data</h2>
+  <p>Kaggle "Air Quality Data in India (2015&ndash;2020)" (<code>rohanrao/air-quality-data-in-india</code>), file <code>city_day.csv</code>. Original source: Central Pollution Control Board (CPCB). Raw data is not in this repository.</p>
+  <div class="grid3">
+    <div class="mini"><b>29,531</b><span>city-days, 26 cities, 16 columns</span></div>
+    <div class="mini"><b>15.9%</b><span>of AQI values are blank</span></div>
+    <div class="mini"><b>8 cities</b><span>appear only in 2019&ndash;2020</span></div>
+  </div>
+  <ul>
+    <li>Some pollutants are never measured in some cities (for example no PM10 in Lucknow).</li>
+    <li>The AQI column was computed by the uploader, is not capped at 500 and contains implausible values (maximum 2,049).</li>
+    <li>No weather data (wind, rain, temperature).</li>
+    <li>A row is used only if both today's and tomorrow's AQI are observed: <b>24,343 rows, 6,330 positive (26.0%)</b>, the same rows for every model and baseline.</li>
+  </ul>
+  <p><b>Target:</b> 1 if tomorrow's AQI is above 200, the official CPCB boundary for "Poor", "Very Poor" and "Severe". Fixed before any results, not tuned.</p>
+</section>
+
+<section id="preprocessing" class="reveal">
+  <h2><i>03</i> Preprocessing</h2>
+  <p>Anything that learns a number from data is fitted on training rows only, inside a scikit-learn <code>Pipeline</code>. Everything else uses only past values.</p>
+  <div class="tablewrap"><table>
+    <tr><th>Step</th><th>What it does</th><th>Learns from data?</th></tr>
+    <tr><td>Explicit calendar</td><td>One row per city per day, so "7 days ago" is truly 7 days ago</td><td>No</td></tr>
+    <tr><td>Drop Xylene</td><td>61% blank</td><td>No</td></tr>
+    <tr><td>Forward-fill (max 3 days)</td><td>Short gaps take the city's last known value</td><td>No (past only)</td></tr>
+    <tr><td>Missing flags</td><td>0/1 columns for PM10, NH3, Toluene, Benzene</td><td>No</td></tr>
+    <tr><td>Lags, rolling means</td><td>AQI, PM2.5, PM10 at 1, 2, 3, 7 days; 3- and 7-day averages ending today; change since yesterday</td><td>No (backward only)</td></tr>
+    <tr><td>Calendar</td><td>Month, day of week, season</td><td>No</td></tr>
+    <tr><td>Capping</td><td>Clip values above the training 99.5th percentile</td><td><b>Yes, train only</b></td></tr>
+    <tr><td>Median fill, scaling</td><td>Fill remaining blanks; common scale</td><td><b>Yes, train only</b></td></tr>
+    <tr><td>One-hot city</td><td>Unseen cities get all-zero columns</td><td><b>Yes, train only</b></td></tr>
+  </table></div>
+  <p>An automated test rebuilds the features after deleting all data past a cutoff and checks that no value changes, which proves no feature uses the future.</p>
+</section>
+
+<section id="methods" class="reveal">
+  <h2><i>04</i> Baselines and methods</h2>
+  <div class="grid3">
+    <div class="mini"><b>Majority</b><span>Always "not Poor". ~74% accuracy, catches nothing.</span></div>
+    <div class="mini"><b>Persistence</b><span>Bad tomorrow if today's AQI &gt; 200. The main bar to beat.</span></div>
+    <div class="mini"><b>Single feature</b><span>Bad tomorrow if today's AQI &gt; a tuned cutoff.</span></div>
+  </div>
+  <ul>
+    <li><b>Logistic regression:</b> probabilities, easy to interpret, suits a thresholded warning (cross-entropy loss).</li>
+    <li><b>Linear and RBF SVM:</b> maximum-margin classifiers (hinge loss). One exact RBF fit took 3 seconds on ~10,000 rows, so the exact kernel was used. Platt scaling gives SVM probabilities.</li>
+  </ul>
+  <p class="callout"><b>Model-choice rule, written before any results:</b> choose logistic regression unless the best SVM is better in most validation folds and clearly better on average. The SVM's PR-AUC gain was smaller than the fold-to-fold spread, and at 80% recall logistic regression had higher precision in all four folds, so <b>logistic regression was chosen</b>.</p>
+</section>
+
+<section id="evaluation" class="reveal">
+  <h2><i>05</i> Evaluation design</h2>
+  <ul>
+    <li><b>Split by time, never shuffled.</b> Train 2015&ndash;2018 (13,024 rows); test 2019 (6,946 rows), used once; 2020 is a stress test (pre-lockdown and lockdown).</li>
+    <li><b>Embargo day:</b> the last day before each cutoff is dropped because its label falls inside the next period.</li>
+    <li><b>Validation:</b> four forward-chaining half-year folds inside 2015&ndash;2018 (506 to 797 positives each), date-based rather than row-based.</li>
+    <li><b>Metrics:</b> PR-AUC (main), precision, recall, F1, ROC-AUC. Accuracy is not used.</li>
+    <li><b>Threshold:</b> highest precision with recall &ge; 80% on pooled validation, then frozen and never re-tuned on test.</li>
+    <li><b>Uncertainty:</b> block bootstrap over whole weeks, since consecutive days are correlated.</li>
+    <li><b>Seen vs new cities:</b> headline = the 18 cities seen in training; the 8 unseen cities are reported separately.</li>
+    <li><b>Flip days:</b> days where the yes/no status changes; persistence is wrong on every one by construction.</li>
+  </ul>
+  <p><b>Cost of errors:</b> a missed bad-air day costs more than a false alarm, so the threshold targets high recall while watching precision.</p>
+</section>
+
+<section id="slider" class="reveal">
+  <h2><i>06</i> Interactive: threshold explorer</h2>
+  <p>Drag the slider, or <b>click and drag directly on the left chart</b>, to move the warning threshold. The dashed line is the <b>frozen threshold</b> used for the reported results. The 2019 view is for exploration only: moving the threshold does not change the reported result.</p>
+  <div class="controls">
+    <label>Data
+      <select id="dataset">
+        <option value="validation">Validation (2017&ndash;2018)</option>
+        <option value="test_2019_seen">Test 2019, seen cities</option>
+      </select>
     </label>
-    <label>Threshold: <b id="tval"></b>
+    <label>Model <select id="model"></select></label>
+    <label class="grow">Threshold: <b id="tval"></b>
       <input type="range" id="t" min="0.05" max="0.95" step="0.01" value="0.70">
     </label>
-    <p id="frozen"></p>
-    <table id="matrix">
-      <tr><th></th><th>Actually bad</th><th>Actually fine</th></tr>
-      <tr><th>Warned</th><td id="tp"></td><td id="fp"></td></tr>
-      <tr><th>No warning</th><td id="fn"></td><td id="tn"></td></tr>
-    </table>
-    <p>Precision: <b id="prec"></b> &nbsp; Recall: <b id="rec"></b></p>
-    <p id="pers"></p>
-  </section>
+    <button id="snap" type="button">Jump to frozen</button>
+  </div>
+  <p id="frozen" class="frozenline"></p>
+  <div class="dash">
+    <div class="matrixbox">
+      <table class="matrix">
+        <tr><th></th><th>Actually bad</th><th>Actually fine</th></tr>
+        <tr><th>Warned</th><td id="tp" class="good"></td><td id="fp" class="bad"></td></tr>
+        <tr><th>No warning</th><td id="fn" class="bad"></td><td id="tn" class="good"></td></tr>
+      </table>
+      <div class="meters">
+        <div><span>Precision</span><div class="bar"><i id="precbar"></i></div><b id="prec"></b></div>
+        <div><span>Recall</span><div class="bar"><i id="recbar" class="amber"></i></div><b id="rec"></b></div>
+      </div>
+      <p id="sentence" class="callout"></p>
+      <p id="pers" class="small"></p>
+    </div>
+    <div class="charts2">
+      <div class="chartbox"><canvas id="chartThreshold"></canvas></div>
+      <div class="chartbox"><canvas id="chartPR"></canvas></div>
+    </div>
+  </div>
+</section>
 
-  <section id="results"><h2>Results</h2><p>TODO</p></section>
-  <section id="errors"><h2>Errors</h2><p>TODO</p></section>
-  <section id="limitations"><h2>Limitations</h2><p>TODO</p></section>
-  <section id="conclusion"><h2>Conclusion</h2><p>TODO</p></section>
-  <section id="reproduce"><h2>Reproduction steps</h2><p>TODO</p></section>
+<section id="results" class="reveal">
+  <h2><i>07</i> Results</h2>
+  <h3>Final test, run once with frozen settings</h3>
+  <p>Pick a group. The headline is <b>2019, seen cities</b>. Intervals are 95% block-bootstrap intervals over weeks.</p>
+  <div id="tabs" class="tabs"></div>
+  <div class="chartbox"><canvas id="chartFinal"></canvas></div>
+  <div class="tablewrap"><table id="finaltable"></table></div>
+  <div class="callout">
+    <p><b>Reading the headline.</b> At the frozen threshold logistic regression has much higher precision than persistence (0.94 vs 0.85) but lower recall (0.78 vs 0.85). The validation target was 0.80, so recall drifted: the bad-day rate fell from 33% in training to 22.6% in 2019.</p>
+    <p><b>Equal-recall check (post-hoc, run after seeing the test, not used to change anything):</b> at persistence's recall of 0.849, logistic regression reached precision 0.913 vs 0.847, a gain of +6.7 points (95% interval +5.0 to +8.6). The SVM gave +6.4 (+4.6 to +8.4). Real, but modest.</p>
+  </div>
+
+  <h3>Per-city results</h3>
+  <div class="controls">
+    <label>Data <select id="citydata"><option value="test_2019">Test 2019 (seen cities)</option><option value="validation">Validation 2017&ndash;2018</option></select></label>
+    <label>Metric <select id="citymetric"><option value="recall">Recall</option><option value="precision">Precision</option></select></label>
+  </div>
+  <div class="chartbox tall"><canvas id="chartCity"></canvas></div>
+  <p class="small">Cities with fewer than 30 bad days are drawn faded and are unreliable. Cities with no bad days are omitted.</p>
+
+  <h3>Which information matters? Ablation (validation)</h3>
+  <p>One feature group removed at a time, logistic regression refitted on the same folds. The dashed line marks the fold-to-fold spread of PR-AUC (about 0.010): changes smaller than that are not distinguishable from noise.</p>
+  <div class="chartbox"><canvas id="chartAblation"></canvas></div>
+  <p>Particulates and recent AQI history carry nearly all the signal; gases, calendar and city add almost nothing. This describes what the model uses, not what causes bad air.</p>
+
+  <div class="grid2">
+    <div>
+      <h3>Regularization</h3>
+      <div class="chartbox"><canvas id="chartReg"></canvas></div>
+      <p class="small">L1 and L2 differ by about 0.0002 PR-AUC, far below the fold spread, so regularization does not change the comparison. The frozen model keeps L2, C = 1.0.</p>
+    </div>
+    <div>
+      <h3>Calibration</h3>
+      <div class="chartbox"><canvas id="chartRel"></canvas></div>
+      <p class="small">Validation reliability diagram: points near the diagonal mean the predicted probability matches the real share of bad days.</p>
+    </div>
+  </div>
+</section>
+
+<section id="timeline" class="reveal">
+  <h2><i>08</i> Interactive: city timeline (2019)</h2>
+  <p>Pick a city to see the model's predicted probability for each day of the 2019 test year (logistic regression). Shaded columns are days that were <b>actually</b> followed by a bad-air day. Each point is the day a prediction was made, for the next day.</p>
+  <div class="controls">
+    <label>City <select id="tlcity"></select></label>
+    <label class="check"><input type="checkbox" id="tluse"> use my slider threshold (otherwise the frozen one)</label>
+  </div>
+  <p id="tlsummary" class="callout"></p>
+  <div class="chartbox tall"><canvas id="chartTimeline"></canvas></div>
+  <p class="legend"><span class="dot green"></span>caught bad day <span class="dot red"></span>missed bad day <span class="dot amber"></span>false alarm</p>
+</section>
+
+<section id="errors" class="reveal">
+  <h2><i>09</i> Errors</h2>
+  <p>All error analysis uses validation predictions only (2017&ndash;2018); the test year was not used.</p>
+  <ul>
+    <li>Of 8,736 rows: 520 missed bad days and 90 false alarms, roughly 6 misses per false alarm.</li>
+    <li>When today is already bad the model catches <b>88%</b> of tomorrow's bad days; when today is clean and tomorrow is bad (a flip) it catches only <b>12.6%</b>.</li>
+    <li>Missed bad days sit close to the line (average AQI about 206 today vs 391 on caught days).</li>
+    <li>Several large errors come from implausible AQI values in the data, such as Ahmedabad readings above 1,000.</li>
+  </ul>
+  <div class="chartbox"><canvas id="chartMonth"></canvas></div>
+  <p class="small">Recall is lowest in March to May; Diwali and crop-burning weeks in October are partly missed.</p>
+</section>
+
+<section id="limitations" class="reveal">
+  <h2><i>10</i> Limitations</h2>
+  <ul>
+    <li><b>No weather data.</b> Wind and rain strongly affect pollution, so sudden flips are mostly missed.</li>
+    <li><b>Mostly follows today's AQI.</b> The gain over persistence is real but modest.</li>
+    <li><b>Selection bias:</b> a row exists only when AQI was reported on both days; if sensors fail more on bad days, used days are not a random sample.</li>
+    <li><b>Coverage:</b> 26 monitored cities, not all of India; monitors do not cover whole cities; Mumbai's AQI is mostly blank; 8 cities never appear in training.</li>
+    <li><b>Dataset AQI</b> was computed by the uploader, is uncapped and has implausible values.</li>
+    <li><b>Threshold drift:</b> bad days were 33% of training but 22.6% of 2019, so recall landed at 0.78, not 0.80.</li>
+    <li><b>New cities:</b> 2019 recall drops to 0.54 (precision stays 0.92); transfer to an unseen city is weaker.</li>
+    <li><b>2020:</b> performance already falls before lockdown (recall 0.69) and the lockdown period has only 32 positives, so those numbers are unreliable.</li>
+    <li><b>Correlated days:</b> the effective sample size is smaller than the row count.</li>
+    <li><b>Cannot claim:</b> causation, performance in other cities, or performance today. The data ends in 2020.</li>
+  </ul>
+</section>
+
+<section id="conclusion" class="reveal">
+  <h2><i>11</i> Conclusion</h2>
+  <p><b>Deployed model:</b> logistic regression, chosen by the rule written before results: the SVM was not clearly better and logistic regression is simpler and easier to explain.</p>
+  <p>Against persistence it raises far fewer false alarms at the frozen threshold, and has about 6.7 points higher precision at equal recall. Its main weakness is that it catches only about 10% of days where clean air turns bad. Because a missed warning costs more than a false alarm, running it at a lower threshold (see the explorer) is the sensible choice, accepting more false alarms for more caught bad days.</p>
+  <p>A modest, honestly measured gain over a strong baseline is the result.</p>
+</section>
+
+<section id="reproduce" class="reveal">
+  <h2><i>12</i> Reproduction steps</h2>
+  <ol>
+    <li>Download <code>city_day.csv</code> (<code>kaggle datasets download -d rohanrao/air-quality-data-in-india</code>) into <code>data/raw/</code>. Raw data is not committed.</li>
+    <li>Create a virtual environment and install <code>requirements.txt</code>.</li>
+    <li>Run in order: <code>data.py</code>, <code>splits.py</code>, <code>python -m pytest tests</code>, <code>baseline.py</code>, <code>models.py</code>, <code>run_svm.py</code>, <code>compare.py</code>, <code>run_eval.py</code>, <code>run_bootstrap.py</code>, <code>run_tables.py</code>, <code>run_regularization.py</code>, <code>run_ablation.py</code>, <code>run_errors.py</code> (all in <code>src/</code>).</li>
+    <li>With <code>outputs/results/frozen_settings.json</code> unchanged, run <code>run_final_test.py</code> and <code>run_equal_recall.py</code> once, then <code>export_site_data.py</code>.</li>
+    <li>Split dates: train 2015-01-01 to 2018-12-30; test 2019-01-01 to 2019-12-30; 2020 pre-lockdown to 2020-03-23; lockdown 2020-03-25 to 2020-07-01. Embargo days: 2018-12-31, 2019-12-31, 2020-03-24.</li>
+  </ol>
+  <p><a href="https://github.com/YOUR_USERNAME/YOUR_REPO">GitHub repository</a>. AI assistance (Claude) was used for brainstorming, coding help and debugging; all results were checked by the author.</p>
+</section>
+
 </main>
+<footer>Data: CPCB via Kaggle &middot; This project predicts; it does not explain causes.</footer>
 <script src="app.js"></script>
 </body>
 </html>
