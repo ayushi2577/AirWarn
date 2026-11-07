@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next-Day Unhealthy Air Warning for Indian Cities</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Can we warn a day ahead when a city's air will be unhealthy?</h1>
+  <p>Predicting whether tomorrow's AQI will be above 200 in 26 Indian cities, 2015 to 2020.</p>
+  <nav>
+    <a href="#question">Question</a> <a href="#data">Data</a>
+    <a href="#preprocessing">Preprocessing</a> <a href="#methods">Methods</a>
+    <a href="#evaluation">Evaluation</a> <a href="#slider">Slider</a>
+    <a href="#results">Results</a> <a href="#errors">Errors</a>
+    <a href="#limitations">Limitations</a> <a href="#conclusion">Conclusion</a>
+    <a href="#reproduce">Reproduce</a>
+  </nav>
+</header>
+<main>
+  <section id="question"><h2>Question</h2><p>TODO</p></section>
+  <section id="data"><h2>Data</h2><p>TODO</p></section>
+  <section id="preprocessing"><h2>Preprocessing</h2><p>TODO</p></section>
+  <section id="methods"><h2>Baselines and methods</h2><p>TODO</p></section>
+  <section id="evaluation"><h2>Evaluation</h2><p>TODO</p></section>
+
+  <section id="slider">
+    <h2>Threshold slider</h2>
+    <p>Move the threshold to see the trade-off between catching bad-air days and false alarms.
+       These are <b>validation</b> results (2017 to 2018), for exploration only.</p>
+    <label>Model
+      <select id="model"></select>
+    </label>
+    <label>Threshold: <b id="tval"></b>
+      <input type="range" id="t" min="0.05" max="0.95" step="0.01" value="0.70">
+    </label>
+    <p id="frozen"></p>
+    <table id="matrix">
+      <tr><th></th><th>Actually bad</th><th>Actually fine</th></tr>
+      <tr><th>Warned</th><td id="tp"></td><td id="fp"></td></tr>
+      <tr><th>No warning</th><td id="fn"></td><td id="tn"></td></tr>
+    </table>
+    <p>Precision: <b id="prec"></b> &nbsp; Recall: <b id="rec"></b></p>
+    <p id="pers"></p>
+  </section>
+
+  <section id="results"><h2>Results</h2><p>TODO</p></section>
+  <section id="errors"><h2>Errors</h2><p>TODO</p></section>
+  <section id="limitations"><h2>Limitations</h2><p>TODO</p></section>
+  <section id="conclusion"><h2>Conclusion</h2><p>TODO</p></section>
+  <section id="reproduce"><h2>Reproduction steps</h2><p>TODO</p></section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
