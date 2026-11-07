@@ -1,0 +1,98 @@
+[
+ {
+  "month": 1,
+  "rows": 646.0,
+  "bad_days": 322.0,
+  "FN": 38.0,
+  "FP": 7.0,
+  "recall": 0.882
+ },
+ {
+  "month": 2,
+  "rows": 608.0,
+  "bad_days": 260.0,
+  "FN": 47.0,
+  "FP": 9.0,
+  "recall": 0.8192
+ },
+ {
+  "month": 3,
+  "rows": 724.0,
+  "bad_days": 245.0,
+  "FN": 76.0,
+  "FP": 7.0,
+  "recall": 0.6898
+ },
+ {
+  "month": 4,
+  "rows": 636.0,
+  "bad_days": 180.0,
+  "FN": 49.0,
+  "FP": 9.0,
+  "recall": 0.7278
+ },
+ {
+  "month": 5,
+  "rows": 695.0,
+  "bad_days": 179.0,
+  "FN": 52.0,
+  "FP": 11.0,
+  "recall": 0.7095
+ },
+ {
+  "month": 6,
+  "rows": 706.0,
+  "bad_days": 117.0,
+  "FN": 27.0,
+  "FP": 7.0,
+  "recall": 0.7692
+ },
+ {
+  "month": 7,
+  "rows": 787.0,
+  "bad_days": 49.0,
+  "FN": 8.0,
+  "FP": 1.0,
+  "recall": 0.8367
+ },
+ {
+  "month": 8,
+  "rows": 749.0,
+  "bad_days": 48.0,
+  "FN": 12.0,
+  "FP": 0.0,
+  "recall": 0.75
+ },
+ {
+  "month": 9,
+  "rows": 706.0,
+  "bad_days": 49.0,
+  "FN": 14.0,
+  "FP": 3.0,
+  "recall": 0.7143
+ },
+ {
+  "month": 10,
+  "rows": 735.0,
+  "bad_days": 285.0,
+  "FN": 59.0,
+  "FP": 12.0,
+  "recall": 0.793
+ },
+ {
+  "month": 11,
+  "rows": 845.0,
+  "bad_days": 443.0,
+  "FN": 47.0,
+  "FP": 10.0,
+  "recall": 0.8939
+ },
+ {
+  "month": 12,
+  "rows": 899.0,
+  "bad_days": 444.0,
+  "FN": 91.0,
+  "FP": 14.0,
+  "recall": 0.795
+ }
+]

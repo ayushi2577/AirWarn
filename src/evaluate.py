@@ -6,14 +6,6 @@ full_metrics(y, score, pred): Calls metrics_at, then adds PR-AUC and ROC-AUC, wh
 change_day_mask(rows): Marks the days where the yes/no status flips (today’s status differs from tomorrow’s). Persistence is wrong on every one of these days.
 
 pick_threshold(y, score, min_recall): Searches thresholds and returns the one with the highest precision while recall stays at least 80%. Use it on validation data only, then freeze the value.
-
-baselines.py (the three simple guesses)
-
-majority(rows): Always predicts 0 (“not Poor”). Shows why accuracy misleads.
-
-persistence(rows): Predicts 1 if today’s AQI is above 200 (“tomorrow = today”). This is the main bar to beat.
-
-single_feature(rows, c): Predicts 1 if today’s AQI is above a tuned cutoff c. Shows how much the extra features add beyond today’s AQI.
 """
 import numpy as np
 from sklearn.metrics import (average_precision_score, roc_auc_score,
@@ -56,3 +48,24 @@ def pick_threshold(y, score, min_recall=0.80):
         return float(thr.min())
     best = ok[np.argmax(prec[:-1][ok])]
     return float(thr[best])
+
+def block_bootstrap(rows, y, score, pred, n_boot=500, seed=0):
+    """Resample whole calendar weeks (with replacement) and recompute metrics.
+    rows needs a 'Date' column. Returns {metric: (low, high)} 95% intervals."""
+    rng = np.random.default_rng(seed)
+    week = rows["Date"].dt.to_period("W").astype(str).values
+    y, score, pred = np.asarray(y), np.asarray(score), np.asarray(pred)
+    idx_by_week = {w: np.where(week == w)[0] for w in np.unique(week)}
+    weeks = list(idx_by_week)
+    out = {"precision": [], "recall": [], "pr_auc": []}
+    for _ in range(n_boot):
+        pick = rng.choice(len(weeks), size=len(weeks), replace=True)
+        idx = np.concatenate([idx_by_week[weeks[k]] for k in pick])
+        if y[idx].sum() == 0:
+            continue
+        m = metrics_at(y[idx], pred[idx])
+        out["precision"].append(m["precision"])
+        out["recall"].append(m["recall"])
+        out["pr_auc"].append(average_precision_score(y[idx], score[idx]))
+    return {k: (float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5)))
+            for k, v in out.items()}

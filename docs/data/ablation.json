@@ -1,0 +1,44 @@
+[
+ {
+  "setting": "all features",
+  "mean_pr_auc": 0.9657394698555248,
+  "mean_recall": 0.8031953684225469,
+  "pooled_precision": 0.9589228662711091
+ },
+ {
+  "setting": "without particulates",
+  "mean_pr_auc": 0.9551802173135758,
+  "mean_recall": 0.8040339463800863,
+  "pooled_precision": 0.9417040358744395
+ },
+ {
+  "setting": "without gases",
+  "mean_pr_auc": 0.9647546309256767,
+  "mean_recall": 0.8029965168849662,
+  "pooled_precision": 0.9568181818181818
+ },
+ {
+  "setting": "without recent_history",
+  "mean_pr_auc": 0.9584103995752881,
+  "mean_recall": 0.8056260934288639,
+  "pooled_precision": 0.946894689468947
+ },
+ {
+  "setting": "without calendar",
+  "mean_pr_auc": 0.9656850915267432,
+  "mean_recall": 0.8024704052585305,
+  "pooled_precision": 0.959304983996342
+ },
+ {
+  "setting": "without city",
+  "mean_pr_auc": 0.9659085176516711,
+  "mean_recall": 0.8020672598351118,
+  "pooled_precision": 0.9592863677950595
+ },
+ {
+  "setting": "recent history only",
+  "mean_pr_auc": 0.9554689053168122,
+  "mean_recall": 0.8063157364132973,
+  "pooled_precision": 0.941782355575459
+ }
+]

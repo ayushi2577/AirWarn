@@ -1,0 +1,4 @@
+model,precision,recall,pr_auc
+Logistic regression,0.948 to 0.969,0.775 to 0.826,0.958 to 0.972
+RBF SVM (Platt),0.940 to 0.963,0.774 to 0.827,0.959 to 0.973
+Persistence,0.876 to 0.906,0.875 to 0.904,0.804 to 0.848

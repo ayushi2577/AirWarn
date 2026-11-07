@@ -1,0 +1,12 @@
+{
+  "thresholds": {
+    "Logistic regression": 0.7073,
+    "RBF SVM (Platt)": 0.7496
+  },
+  "svm_params": {
+    "C": 4.0,
+    "gamma": 0.003
+  },
+  "platt_coef": 2.1497058806186278,
+  "platt_intercept": -0.02407633365361986
+}
