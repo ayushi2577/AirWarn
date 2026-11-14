@@ -1,4 +1,5 @@
 data/raw/
+data/processed/
 kaggle.json
 venv/
 __pycache__/
