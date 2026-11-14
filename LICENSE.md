@@ -38,8 +38,8 @@ SOFTWARE.
 | File used | `city_day.csv` |
 | Original source | Central Pollution Control Board (CPCB), Government of India, https://cpcb.nic.in/ |
 | Access | Public and free, with a Kaggle login |
-| Licence shown on the Kaggle page | **FILL IN: copy the licence name exactly as shown on the dataset page, checked on DATE** |
-| Terms stated in the dataset description | **FILL IN: copy or paraphrase what the description says about reuse and attribution** |
+| Licence shown on the Kaggle page | CC0: Public Domain (checked on the dataset page on 14 November 2026) |
+| Terms stated in the dataset description | The description states no reuse or attribution conditions. Under CC0 the data may be reused freely; we still credit CPCB and the uploader. The description also links the uploader's AQI tutorial: https://www.kaggle.com/rohanrao/calculating-aqi-air-quality-index |
 
 ### How the data is handled in this project
 
