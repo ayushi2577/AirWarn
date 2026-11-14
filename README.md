@@ -1,6 +1,6 @@
 # Next-Day Unhealthy Air Warning for Indian Cities
 
-**Course:** ES 335 (pair project) | **Author:** Ayushi Agrawal, 26120002 and Pranjali Buddhe, 26120009
+**Course:** ES 335 (pair project) | **Author:** Ayushi Agrawal, 26120002 and Pranjali Buddhe, 26120006
 
 **Live website:** https://ayushi2577.github.io/Air-quality/
 **Repository:** https://github.com/ayushi2577/Air-quality
