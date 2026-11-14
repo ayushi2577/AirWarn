@@ -89,6 +89,12 @@
     <li><b>Logistic regression:</b> probabilities, easy to interpret, suits a thresholded warning (cross-entropy loss).</li>
     <li><b>Linear and RBF SVM:</b> maximum-margin classifiers (hinge loss). One exact RBF fit took 3 seconds on ~10,000 rows, so the exact kernel was used. Platt scaling gives SVM probabilities.</li>
   </ul>
+  <details class="callout">
+    <summary><b>Objectives and assumptions (short derivations)</b></summary>
+    <p><b>Logistic regression.</b> Model <i>p</i> = &sigma;(<i>w</i>&middot;<i>x</i> + <i>b</i>), assuming each label is Bernoulli with that probability and the log-odds are linear in the features. Maximising the likelihood is the same as minimising the cross-entropy loss <i>L</i> = &minus;(1/<i>n</i>) &sum; [<i>y</i> log <i>p</i> + (1&minus;<i>y</i>) log(1&minus;<i>p</i>)]. Its gradient is &nabla;<sub><i>w</i></sub><i>L</i> = (1/<i>n</i>) <i>X</i><sup>T</sup>(<i>p</i> &minus; <i>y</i>), which is convex, so gradient descent reaches the single optimum. L2 adds &lambda;<i>w</i> to the gradient and L1 adds &lambda;&middot;sign(<i>w</i>).</p>
+    <p><b>Soft-margin SVM.</b> Minimise &frac12;&Vert;<i>w</i>&Vert;&sup2; + <i>C</i> &sum; &xi;<sub><i>i</i></sub> subject to <i>y<sub>i</sub></i>(<i>w</i>&middot;<i>x<sub>i</sub></i> + <i>b</i>) &ge; 1 &minus; &xi;<sub><i>i</i></sub>, &xi;<sub><i>i</i></sub> &ge; 0 (with <i>y</i> in {&minus;1, +1}). This equals minimising the hinge loss max(0, 1 &minus; <i>y</i>&middot;score) plus an L2 penalty, where <i>C</i> controls the regularisation. The RBF kernel <i>K</i>(<i>x</i>, <i>x&prime;</i>) = exp(&minus;&gamma;&Vert;<i>x</i> &minus; <i>x&prime;</i>&Vert;&sup2;) lets the boundary curve. The linear SVM here uses scikit-learn's squared hinge default.</p>
+    <p><b>Why they should be close.</b> Cross-entropy and hinge loss both penalise confident wrong scores and ignore easy, correct ones, so on mostly linear signal (today's AQI) a linear SVM and logistic regression behave alike. The main difference is that logistic regression outputs probabilities directly, while the SVM needs Platt scaling.</p>
+  </details>
   <p class="callout"><b>Model-choice rule, written before any results:</b> choose logistic regression unless the best SVM is better in most validation folds and clearly better on average. The SVM's PR-AUC gain was smaller than the fold-to-fold spread, and at 80% recall logistic regression had higher precision in all four folds, so <b>logistic regression was chosen</b>.</p>
 </section>
 
@@ -241,7 +247,7 @@
     <li>With <code>outputs/results/frozen_settings.json</code> unchanged, run <code>run_final_test.py</code> and <code>run_equal_recall.py</code> once, then <code>export_site_data.py</code>.</li>
     <li>Split dates: train 2015-01-01 to 2018-12-30; test 2019-01-01 to 2019-12-30; 2020 pre-lockdown to 2020-03-23; lockdown 2020-03-25 to 2020-07-01. Embargo days: 2018-12-31, 2019-12-31, 2020-03-24.</li>
   </ol>
-  <p><a href="https://github.com/ayushi2577/Air-quality">GitHub repository</a>. AI assistance (Claude) was used for brainstorming, coding help and debugging; all results were checked by the author.</p>
+  <p><a href="https://github.com/ayushi2577/Air-quality">GitHub repository</a>. AI assistance (Claude) was used for brainstorming, coding help and debugging; all results were checked by the authors.</p>
 </section>
 
 </main>
