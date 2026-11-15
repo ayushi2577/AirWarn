@@ -1,42 +1,61 @@
 # AI Tools Disclosure
 
-**Tool used:** Claude (Anthropic), via the Claude chat interface.
+**Tools used:** ChatGPT (OpenAI) and Claude (Anthropic), both through their chat interfaces.
 
-## How We Used Claude
+**In one line:** ChatGPT helped us explore and compare options. Claude helped with coding, debugging and other engineering work. We made every decision, ran every script and checked every result ourselves.
 
-Claude was used as an assisting tool throughout the project, primarily to speed up implementation, handle repetitive coding tasks and support technical exploration.
+## Who did what
 
-- **Brainstorming and planning:** Discussed possible project directions and used Claude to explore implementation approaches. We evaluated the suggestions and finalized the research question, AQI > 200 prediction target, temporal split strategy and overall experimental design.
-- **ML methodology and implementation:** We determined the machine learning approach, preprocessing requirements, feature construction strategy, baseline comparisons, evaluation methodology and model selection criteria. Claude assisted in translating these decisions into Python code, particularly for repetitive implementation tasks and structuring scripts.
-- **Code exploration and development:** Used Claude to help draft, refine and explain code for data loading, feature engineering, preprocessing pipelines, baseline models, evaluation scripts, block bootstrap analysis and the project website. We reviewed the implementations and adapted them to the requirements of the project.
-- **Debugging and technical assistance:** Used Claude to investigate implementation errors, import issues, warnings and compatibility problems. We reviewed the suggested fixes and tested them in the actual project environment.
-- **ML concept clarification:** Discussed concepts such as data leakage, embargo days, Platt scaling, probability calibration and temporal validation to clarify their implications for the experimental design.
-- **Documentation:** Used assistance for improving the clarity and structure of the README, website content and AI disclosure.
+| Area | ChatGPT | Claude | We |
+|---|---|---|---|
+| Exploring and comparing options (dataset candidates, model families, metrics) | Explored and listed options | | Chose |
+| Question, AQI > 200 target, time split, embargo days, validation folds | | | Decided |
+| Feature and preprocessing decisions | | | Decided |
+| Baselines, models, model-choice rule (written before seeing results), threshold rule | | | Decided |
+| Writing code: data, features, pipeline, models, evaluation, extra experiments, site data export | | Drafted and refined | Reviewed and adapted |
+| No-future leakage test | | Drafted | Ran and checked |
+| Website layout, design and interaction code | | Drafted and refined | Reviewed and decided what to show |
+| Website text, README and this disclosure | | Drafted wording | Decided content, edited and approved |
+| Debugging errors and warnings | | Investigated and suggested fixes | Tested fixes in our own environment |
+| Explaining concepts (data leakage, embargo days, Platt scaling, calibration, evaluation metrics) | | Explained | Learned and can explain them |
+| Running all scripts and the final test (once, with frozen settings) | | | Did |
+| Checking counts and consistency across stages | | | Did |
+| Reading and interpreting the results | | | Did |
 
-## What We Did Independently
+## What ChatGPT did
 
-We were responsible for the core research and experimental decisions throughout the project.
+- Helped us explore and compare options when we needed to choose: candidate datasets, model families and evaluation metrics.
+- It did not write project code and did not make any decision for us.
 
-- Selected the dataset, formulated the prediction target (AQI > 200) and established the temporal evaluation strategy.
-- Designed the training and evaluation split, including the split dates, embargo mechanism and decision to retain all four evaluation folds.
-- Determined the feature engineering and preprocessing requirements based on the prediction task and leakage constraints.
-- Decided which baselines and models to compare and established the model selection rule before examining the final results.
-- Evaluated the suitability of logistic regression and selected it using the predefined selection criterion.
-- Ran the scripts and experiments on our own machines, inspected outputs and checked consistency across different stages of the pipeline.
-- Verified that the data counts matched the proposal: 24,343 evaluation rows, 6,330 positive samples and 13,024 training rows.
-- Ran the automated no-future test and checked that the implementation respected the temporal constraints.
-- Conducted the final evaluation once, without further tuning based on the final test results.
+## What Claude did
 
-## Verification and Responsibility
+- **Code:** drafted, refined and explained code for data loading, feature engineering, the preprocessing pipeline, baselines, models, evaluation scripts, the block bootstrap, the extra experiments and the website.
+- **Debugging:** helped investigate errors, import issues, warnings and compatibility problems.
+- **Concepts:** explained data leakage, embargo days, Platt scaling, probability calibration and temporal validation.
+- **Documentation:** helped with the README, website wording and this disclosure.
+- **Review and edits:** helped us understand the full project, checked the website against the course rubric, and edited the website files (an extra threshold slider, removal of duplicated and unused code, and shorter explanations).
 
-We did not treat AI-generated code or explanations as automatically correct. We reviewed the implementations, tested the scripts, compared outputs across different components and checked the results against the project's predefined requirements.
+## What we did ourselves
 
-We are responsible for the experimental design, methodological decisions, interpretation and reported results. We can explain the reasoning behind the ML pipeline, the evaluation strategy and the implementation choices.
+- Chose the dataset and formulated the question and the AQI > 200 target.
+- Designed the time-based split, the embargo days and the four forward-chaining validation folds.
+- Decided which features, preprocessing, baselines and models to use.
+- Wrote the model-choice rule before seeing the final results: choose logistic regression unless the SVM wins in most folds and is clearly better on average.
+- Chose the threshold rule and froze the settings before the test year was used.
+- Ran all scripts and experiments on our own machines and inspected the outputs.
+- Verified the counts against our proposal: 24,343 evaluation rows, 6,330 positives and 13,024 training rows.
+- Ran the automated no-future test.
+- Ran the final test once, without changing anything afterwards.
+- Interpreted the results and decided what the website says.
 
-## External Code, Libraries and Data
+## Verification and responsibility
 
-**Libraries and frameworks:** pandas, NumPy, scikit-learn, Matplotlib, pytest, pyarrow and Chart.js.
+We did not treat any AI output as automatically correct. We read and tested the code, compared numbers across scripts, tables and the website, and checked results against the rules we set in advance. We are responsible for the design, the decisions, the results and the interpretation, and we can explain and defend every part of the work.
 
-**Dataset:** CPCB air-quality data obtained through the Kaggle dataset `rohanrao/air-quality-data-in-india`, uploaded by Rohan Rao.
+## External code, libraries and data
+
+**Libraries:** pandas, NumPy, scikit-learn, Matplotlib, pytest, pyarrow, joblib, SciPy and Chart.js.
+
+**Dataset:** CPCB air-quality data from the Kaggle dataset `rohanrao/air-quality-data-in-india`, uploaded by Rohan Rao. The raw data is not included in this repository.
 
 No other external code was copied into the project.

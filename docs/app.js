@@ -60,83 +60,6 @@ loadJSON("data/thresholds.json").then(initExplorer).catch(()=>{
   document.getElementById("frozen").textContent="Could not load data/thresholds.json";
 });
 
-function initExplorer(d){
-  const dsSel=document.getElementById("dataset"), modelSel=document.getElementById("model"),
-        slider=document.getElementById("t");
-  const names=Object.keys(d.validation);
-  names.forEach(n=>modelSel.add(new Option(n,n)));
-  if(!d.test_2019_seen) dsSel.querySelector('option[value="test_2019_seen"]').disabled=true;
-  const rows=()=>d[dsSel.value][modelSel.value];
-  const pers=()=>dsSel.value==="validation"?d.persistence:d.persistence_test_2019_seen;
-  const nearest=(r,t)=>r.reduce((a,b)=>Math.abs(b.threshold-t)<Math.abs(a.threshold-t)?b:a);
-  STATE.frozen=d.frozen_thresholds[names[0]]; STATE.model=names[0];
-
-  const thr=new Chart(document.getElementById("chartThreshold"),{
-    type:"scatter",
-    data:{datasets:[
-      {label:"Precision",borderColor:TEAL,backgroundColor:TEAL,showLine:true,pointRadius:0,tension:.25,data:[]},
-      {label:"Recall",borderColor:AMBER,backgroundColor:AMBER,showLine:true,pointRadius:0,tension:.25,data:[]}]},
-    options:{animation:false,
-      plugins:{title:{display:true,text:"Precision and recall vs threshold (drag me)",color:"#c3cddd"},
-               vlines:{lines:[]},legend:{labels:{boxWidth:10}}},
-      scales:{x:{type:"linear",min:.05,max:.95,title:{display:true,text:"threshold"}},
-              y:{min:0,max:1}}}
-  });
-  const pr=new Chart(document.getElementById("chartPR"),{
-    type:"scatter",
-    data:{datasets:[
-      {label:"Model",borderColor:TEAL,backgroundColor:TEAL,showLine:true,pointRadius:0,data:[]},
-      {label:"Persistence",type:"scatter",pointStyle:"star",pointRadius:11,borderColor:ROSE,backgroundColor:ROSE,data:[]},
-      {label:"Your threshold",pointRadius:7,pointHoverRadius:9,borderColor:"#fff",backgroundColor:AMBER,data:[]}]},
-    options:{animation:false,
-      plugins:{title:{display:true,text:"Precision-recall curve",color:"#c3cddd"},legend:{labels:{boxWidth:10}},
-        tooltip:{mode:"nearest",intersect:true,callbacks:{label:c=>`${c.dataset.label}: recall ${fmt(c.parsed.x)}, precision ${fmt(c.parsed.y)}`}}},
-      scales:{x:{type:"linear",min:0,max:1,title:{display:true,text:"recall"}},
-              y:{min:0,max:1,title:{display:true,text:"precision"}}}}
-  });
-
-  function setT(v){
-    v=Math.max(.05,Math.min(.95,Math.round(v*100)/100));
-    slider.value=v; draw();
-  }
-  const cv=document.getElementById("chartThreshold"); let down=false;
-  const fromEvent=e=>setT(thr.scales.x.getValueForPixel(e.clientX-cv.getBoundingClientRect().left));
-  cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);fromEvent(e);});
-  cv.addEventListener("pointermove",e=>{if(down)fromEvent(e);});
-  cv.addEventListener("pointerup",()=>down=false);
-
-  function draw(){
-    const name=modelSel.value, t=parseFloat(slider.value), rs=rows(), r=nearest(rs,t), f=d.frozen_thresholds[name];
-    STATE.t=t; STATE.model=name; STATE.frozen=f;
-    document.getElementById("tval").textContent=t.toFixed(2);
-    ["TP","FP","FN","TN"].forEach(k=>document.getElementById(k.toLowerCase()).textContent=r[k].toLocaleString());
-    document.getElementById("prec").textContent=fmt(r.precision);
-    document.getElementById("rec").textContent=fmt(r.recall);
-    document.getElementById("precbar").style.width=(r.precision*100)+"%";
-    document.getElementById("recbar").style.width=(r.recall*100)+"%";
-    document.getElementById("frozen").textContent="Frozen threshold for this model: "+f.toFixed(3)+(Math.abs(f-t)<.006?"  (you are at it)":"");
-    document.getElementById("sentence").innerHTML=
-      `Of <b>${(r.TP+r.FN).toLocaleString()}</b> bad-air days, the warning catches <b>${r.TP.toLocaleString()}</b> and misses <b>${r.FN.toLocaleString()}</b>. It raises <b>${r.FP.toLocaleString()}</b> false alarms.`;
-    const p=pers();
-    document.getElementById("pers").textContent=`Persistence (tomorrow = today), same data: precision ${fmt(p.precision)}, recall ${fmt(p.recall)}.`;
-
-    thr.data.datasets[0].data=rs.map(x=>({x:x.threshold,y:x.precision}));
-    thr.data.datasets[1].data=rs.map(x=>({x:x.threshold,y:x.recall}));
-    thr.options.plugins.vlines.lines=[
-      {x:f,color:AMBER,dash:[6,5],label:"frozen"},
-      {x:t,color:"#ffffff",width:2}];
-    thr.update("none");
-    pr.data.datasets[0].label=name; pr.data.datasets[0].data=rs.map(x=>({x:x.recall,y:x.precision}));
-    pr.data.datasets[1].data=[{x:p.recall,y:p.precision}];
-    pr.data.datasets[2].data=[{x:r.recall,y:r.precision}];
-    pr.update("none");
-    if(STATE.onChange) STATE.onChange();
-  }
-  modelSel.onchange=draw; dsSel.onchange=draw; slider.oninput=draw;
-  document.getElementById("snap").onclick=()=>setT(d.frozen_thresholds[modelSel.value]);
-  slider.value=d.frozen_thresholds[names[0]]; draw();
-}
-
 /* ============ 2. final test explorer ============ */
 loadJSON("data/final_results.json").then(rows=>{
   const parts=[...new Set(rows.map(r=>r.part))];
@@ -257,54 +180,6 @@ loadJSON("data/errors_by_month.json").then(rows=>{
   });
 }).catch(()=>{});
 
-/* ============ 8. city timeline ============ */
-loadJSON("data/timeline.json").then(tl=>{
-  const sel=document.getElementById("tlcity"), use=document.getElementById("tluse");
-  const names=Object.keys(tl.cities).filter(c=>tl.cities[c].y.some(v=>v===1))
-    .sort((a,b)=>tl.cities[b].y.reduce((s,v)=>s+v,0)-tl.cities[a].y.reduce((s,v)=>s+v,0));
-  names.forEach(c=>sel.add(new Option(c+(tl.cities[c].seen?"":" (new city)"),c)));
-  const chart=new Chart(document.getElementById("chartTimeline"),{
-    type:"bar",
-    data:{labels:[],datasets:[
-      {type:"bar",label:"Actually bad next day",data:[],backgroundColor:"rgba(45,212,191,.16)",
-        barPercentage:1,categoryPercentage:1,borderWidth:0,order:3},
-      {type:"line",label:"Predicted probability",data:[],borderColor:"rgba(231,236,245,.8)",borderWidth:1.5,
-        pointRadius:[],pointBackgroundColor:[],pointBorderWidth:0,tension:.15,order:1},
-      {type:"line",label:"Threshold",data:[],borderColor:AMBER,borderDash:[6,5],borderWidth:1.5,pointRadius:0,order:2}]},
-    options:{plugins:{legend:{labels:{boxWidth:10}},
-        tooltip:{callbacks:{title:i=>"Prediction day "+i[0].label,
-          label:c=>c.datasetIndex===1?`probability ${fmt(c.parsed.y,2)}`:(c.datasetIndex===0?(c.parsed.y?"actually bad next day":"actually fine next day"):`threshold ${fmt(c.parsed.y,2)}`)}}},
-      scales:{y:{min:0,max:1,title:{display:true,text:"predicted probability of a bad day tomorrow"}},
-              x:{ticks:{maxTicksLimit:12,callback(v){return this.getLabelForValue(v).slice(5);}}}}}
-  });
-  function draw(){
-    const c=tl.cities[sel.value];
-    const t=(use.checked&&STATE.t!=null)?STATE.t:tl.threshold;
-    let tp=0,fn=0,fp=0;
-    const colr=[],rad=[];
-    c.p.forEach((p,i)=>{
-      const pred=p>=t, y=c.y[i];
-      if(y&&pred){tp++;colr.push(TEAL);rad.push(3);}
-      else if(y&&!pred){fn++;colr.push(ROSE);rad.push(4);}
-      else if(!y&&pred){fp++;colr.push(AMBER);rad.push(4);}
-      else{colr.push("transparent");rad.push(0);}
-    });
-    chart.data.labels=c.dates;
-    chart.data.datasets[0].data=c.y;
-    chart.data.datasets[1].data=c.p;
-    chart.data.datasets[1].pointBackgroundColor=colr;
-    chart.data.datasets[1].pointRadius=rad;
-    chart.data.datasets[2].data=c.dates.map(()=>t);
-    chart.update("none");
-    const bad=tp+fn;
-    document.getElementById("tlsummary").innerHTML=
-      `<b>${sel.value}</b>${c.seen?"":" (a city never seen in training)"}: ${bad} bad days in 2019; caught <b>${tp}</b>, missed <b>${fn}</b>, false alarms <b>${fp}</b> at threshold ${t.toFixed(2)}.`;
-  }
-  sel.onchange=draw; use.onchange=draw;
-  const prev=STATE.onChange; STATE.onChange=()=>{ if(prev) prev(); if(use.checked) draw(); };
-  draw();
-}).catch(()=>{ document.getElementById("tlsummary").textContent="Run src/export_site_data.py to create data/timeline.json"; });
-
 /* expandable rows: click anywhere on the row header */
 document.addEventListener("click",e=>{
   const head=e.target.closest(".acc .head"); if(!head) return;
@@ -314,7 +189,7 @@ document.addEventListener("click",e=>{
 
 function initExplorer(d){
   const dsSel=document.getElementById("dataset"), modelSel=document.getElementById("model"),
-        slider=document.getElementById("t");
+        slider=document.getElementById("t"), slider2=document.getElementById("t2");
   const names=Object.keys(d.validation);
   names.forEach(n=>modelSel.add(new Option(n,n)));
   if(!d.test_2019_seen) dsSel.querySelector('option[value="test_2019_seen"]').disabled=true;
@@ -382,6 +257,7 @@ function initExplorer(d){
     const name=modelSel.value, t=parseFloat(slider.value), rs=rows(), r=nearest(rs,t), f=d.frozen_thresholds[name];
     STATE.t=t; STATE.model=name; STATE.frozen=f;
     document.getElementById("tval").textContent=t.toFixed(2);
+    slider2.value=slider.value; document.getElementById("tval2").textContent=t.toFixed(2);   /* keep bottom slider in sync */
     ["TP","FP","FN","TN"].forEach(k=>document.getElementById(k.toLowerCase()).textContent=r[k].toLocaleString());
     document.getElementById("prec").textContent=fmt(r.precision);
     document.getElementById("rec").textContent=fmt(r.recall);
@@ -418,6 +294,7 @@ function initExplorer(d){
     if(STATE.onChange) STATE.onChange();
   }
   modelSel.onchange=draw; dsSel.onchange=draw; slider.oninput=draw;
+  slider2.oninput=()=>{ slider.value=slider2.value; draw(); };   /* bottom slider drives the top one */
   document.getElementById("snap").onclick=()=>setT(d.frozen_thresholds[modelSel.value]);
   slider.value=d.frozen_thresholds[names[0]]; draw();
 }

@@ -16,7 +16,7 @@
   <span class="brand">&#9679; AirWarn</span>
   <a href="#question">Question</a><a href="#data">Data</a><a href="#preprocessing">Preprocessing</a>
   <a href="#methods">Methods</a><a href="#evaluation">Evaluation</a><a href="#slider">Slider</a>
-  <a href="#results">Results</a><a href="#timeline">Timeline</a><a href="#errors">Errors</a>
+  <a href="#results">Results</a><a href="#errors">Errors</a>
   <a href="#limitations">Limitations</a><a href="#conclusion">Conclusion</a><a href="#reproduce">Reproduce</a>
 </nav>
 
@@ -75,7 +75,7 @@
   <div class="grid3">
     <div class="mini"><b>29,531</b><span>city-days, 16 columns in the raw file</span></div>
     <div class="mini"><b>26 cities</b><span>2015-01-01 to 2020-07-01</span></div>
-    <div class="mini"><b>0</b><span>duplicate city-dates in the raw file; every city has a row for every day between its first and last date (blank values are common, missing rows are not)</span></div>
+    <div class="mini"><b>0 duplicate city-days.</b><span>No missing dates, only blank values</span></div>
   </div>
 
   <h3>Variables: what each is, how much is missing, and how we handled it</h3>
@@ -158,10 +158,7 @@
   <h2><i>03</i> Preprocessing, and why</h2>
 
   <div class="callout">
-    <p><b>How to read the "Fixed rule or fitted?" column.</b></p>
-    <p><b>Fixed rule:</b> the recipe is the same whatever the data looks like (for example, "copy yesterday's value into a blank"). It needs no numbers calculated from the dataset.</p>
-    <p><b>Fitted on training rows only:</b> the recipe contains a number that must first be calculated from data, such as the median used to fill blanks, the 99.5th percentile used as a cap, the mean and spread used for scaling, or the list of cities. If we calculated that number from all years, the 2019 readings would influence the numbers used to predict 2019, which is a leak. So we calculate it from the training rows only.</p>
-    <p>All fitted steps sit inside a scikit-learn <code>Pipeline</code>. In each validation fold, the pipeline first <i>fits</i> these numbers on that fold's training rows and then only <i>applies</i> the same numbers to the validation rows. For example, in fold 2 the PM10 median comes from the rows up to June 2017, and the July&ndash;December 2017 rows are filled with that median even if their own median is different. The final test works the same way: the numbers come from 2015&ndash;2018 only.</p>
+    <p><b>How to read &ldquo;Fixed rule or fitted?&rdquo;</b> A <i>fixed rule</i> needs no numbers from the data (for example, copy yesterday&rsquo;s value into a blank). A <i>fitted</i> step calculates a number from data (median, 99.5% cap, scaling, city list), so we calculate it from <b>training rows only</b>. Otherwise 2019 would influence the numbers used to predict 2019. All fitted steps sit inside a scikit-learn <code>Pipeline</code>, which fits them on the training rows and only applies them to validation and test rows.</p>
   </div>
 
   <div class="tablewrap"><table>
@@ -188,15 +185,15 @@
   <h3>Baselines</h3>
   <div class="grid3">
     <div class="mini"><b>Majority</b><span>Always "not Poor". About 74% accuracy but zero bad days caught, which is why we do not use accuracy.</span></div>
-    <div class="mini"><b>Persistence</b><span>Bad tomorrow if today's AQI is above 200. Strong, because pollution changes slowly. The main bar to beat.</span></div>
-    <div class="mini"><b>Tuned single feature</b><span>Bad tomorrow if today's AQI is above a cutoff chosen on validation (234). Shows what the extra features add beyond today's AQI.</span></div>
+    <div class="mini"><b>Persistence</b><span>Bad tomorrow if today's AQI is above 200. Assumes air quality changes slowly from one day to the next, which makes it strong. The main bar to beat.</span></div>
+    <div class="mini"><b>Tuned single feature</b><span>Bad tomorrow if today's AQI is above a cutoff chosen on validation (234). Assumes today's AQI alone carries the signal. Shows what the extra features add beyond it.</span></div>
   </div>
 
   <h3>Models</h3>
   <ul>
-    <li><b>Logistic regression:</b> a weighted sum of the features turned into a probability, trained by minimizing cross-entropy loss. We use it because it gives probabilities (needed for a threshold), is easy to interpret, and fits a warning system. L2 penalty, C = 1.</li>
-    <li><b>Linear SVM:</b> finds the widest-margin straight boundary using hinge loss. Expected to behave much like logistic regression.</li>
-    <li><b>RBF SVM:</b> a curved boundary through a kernel. One exact fit took 3 seconds on about 10,000 rows, so we used the exact kernel and did not need the Nystroem approximation. Platt scaling turns its scores into probabilities.</li>
+    <li><b>Logistic regression:</b> a weighted sum of the features turned into a probability, trained by minimizing cross-entropy loss. We use it because it gives probabilities (needed for a threshold), is easy to interpret, and fits a warning system. Assumes each feature shifts the odds of a bad day in a straight-line way. L2 penalty, C = 1.</li>
+    <li><b>Linear SVM:</b> finds the widest-margin straight boundary using hinge loss. Expected to behave much like logistic regression. Assumes the classes can be separated by a straight boundary.</li>
+    <li><b>RBF SVM:</b> a curved boundary through a kernel. One exact fit took 3 seconds on about 10,000 rows, so we used the exact kernel and did not need the Nystroem approximation. Platt scaling turns its scores into probabilities. Assumes a smooth, curved boundary can separate the classes.</li>
   </ul>
 
   <h3>Validation comparison (4 forward-chaining folds)</h3>
@@ -230,6 +227,7 @@
     <div class="seg lock" style="flex:.28"><b>Lockdown</b></div>
   </div>
   <p class="small">Thin grey slices are embargo days. 2020 pre-lockdown: 1,941 rows, 409 positive. Lockdown and unlock: 2,369 rows, only 32 positive.</p>
+  <p><b>What about 2020?</b> 2020 was never used for training or tuning. We ran the same frozen model on it as a stress test, split at the 25 March lockdown. Before lockdown, recall in seen cities falls to 0.69. During lockdown only 32 days were bad, too few to draw conclusions.</p>
 
   <div class="folds">
     <div><b>Fold 1</b> train &rarr; 2016, validate Jan&ndash;Jun 2017 <em>(506 pos.)</em></div>
@@ -245,7 +243,7 @@
     <li><b>Validation.</b> Four forward-chaining half-year folds inside 2015&ndash;2018, each training on all earlier dates. We built them from dates because scikit-learn's <code>TimeSeriesSplit</code> splits by row position and would mix cities.</li>
     <li><b>Metrics.</b> PR-AUC is the main metric because only 26% of days are positive. We also report precision, recall, F1 and ROC-AUC. Accuracy is shown only to explain why it misleads.</li>
     <li><b>Threshold.</b> Chosen on pooled validation as the highest precision with recall at least 80%, then frozen. It was never re-tuned on the test.</li>
-    <li><b>Change (flip) days.</b> Days when the yes/no status flips. Persistence is wrong on every one by construction, so they show what a model adds.</li>
+    <li><b>Change (flip) days.</b> Days when today&rsquo;s status differs from tomorrow&rsquo;s, for example AQI 180 today and 230 tomorrow. Persistence is wrong on every one by construction, so they show what a model adds.</li>
     <li><b>Seen vs new cities.</b> Headline results use the 18 cities seen in training. The 8 never-seen cities are reported separately.</li>
     <li><b>Uncertainty.</b> A block bootstrap resamples whole weeks, because consecutive days are correlated.</li>
     <li><b>Test rule.</b> The test set was used once, after everything was frozen, and it never influenced a choice.</li>
@@ -260,8 +258,8 @@
   <div class="controls">
     <label>Data
       <select id="dataset">
-        <option value="validation">Validation (2017&ndash;2018)</option>
-        <option value="test_2019_seen">Test 2019, seen cities</option>
+        <option value="test_2019_seen" selected>Test 2019, seen cities</option>
+        <option value="validation">Validation 2017&ndash;2018 (where the threshold was chosen)</option>
       </select>
     </label>
     <label>Model <select id="model"></select></label>
@@ -306,11 +304,19 @@
       <p id="pers" class="small"></p>
     </div>
   </div>
+
+  <div class="stickyctl">
+    <label>Threshold: <b id="tval2"></b>
+      <input type="range" id="t2" min="0.05" max="0.95" step="0.01" value="0.70">
+    </label>
+    <span class="small">(same slider as the one above, repeated here for convenience)</span>
+  </div>
 </section>
 
 <!-- ============ 7. RESULTS ============ -->
 <section id="results" class="reveal">
   <h2><i>07</i> Results</h2>
+  <p class="callout"><b>Result in one line:</b> on the 2019 test (seen cities), logistic regression reaches about 94% precision and 78% recall. At the same recall as &ldquo;tomorrow = today&rdquo;, it is about 6.7 points more precise. It mostly follows today&rsquo;s AQI and misses most sudden clean-to-bad jumps.</p>
   <h3>Headline: 2019 test, 18 seen cities</h3>
   <p>Frozen threshold, run once, 95% block-bootstrap intervals over weeks. Use the tabs to see new cities and the 2020 periods.</p>
   <div id="tabs" class="tabs"></div>
@@ -322,7 +328,7 @@
     <p>1. At the frozen threshold, logistic regression has far higher precision than persistence (0.94 vs 0.85) but lower recall (0.78 vs 0.85). The validation target was 0.80. Recall drifted down because bad days were 33% of training but 22.6% of 2019.</p>
     <p>2. <b>Equal-recall check</b> (run after seeing the test, not used to change anything): at persistence's recall of 0.849, logistic regression reached precision 0.913 vs 0.847, a gain of <b>+6.7 points</b> (95% interval +5.0 to +8.6). The SVM gave +6.4 (+4.6 to +8.4). The gain is real but modest.</p>
     <p>3. On validation, the tuned single-feature rule (AQI above 234) reached precision 0.944 at recall 0.80, against 0.959 for logistic regression. Most of the signal sits in today's AQI; the extra features add about 1.6 points. We did not score this rule on the test year.</p>
-    <p>4. Logistic regression and the SVM are tied, which supports the simpler choice.</p>
+    <p>4. We chose logistic regression by a rule set before seeing results: pick the SVM only if it clearly wins in most folds. It did not (PR-AUC 0.958 vs 0.959 on the 2019 test), so we kept the simpler model.</p>
   </div>
 
   <p><b>New cities (2019, 762 rows, 114 positive).</b> Precision stays high (0.92) but recall falls to 0.54, so transfer to a city the model has never seen is weaker.</p>
@@ -339,29 +345,16 @@
   <h3>Which information matters? Ablation (validation)</h3>
   <p>One feature group removed at a time, logistic regression refitted on the same folds. The dashed line marks the fold-to-fold spread of PR-AUC (about 0.010); changes smaller than that are not distinguishable from noise.</p>
   <div class="chartbox"><canvas id="chartAblation"></canvas></div>
-  <p>Removing particulates costs 0.011 PR-AUC and removing recent AQI history costs 0.007, both about the size of the fold spread. Removing gases, calendar or city changes nothing measurable. Recent history alone scores only 0.010 below the full model. This describes what the model uses, not what causes bad air. The groups overlap, because AQI is largely driven by PM2.5 and PM10, so each drop understates that group's importance.</p>
+  <p>Particulates and recent AQI history matter most; gases, calendar and city add nothing measurable. This shows what the model uses, not what causes bad air. The groups overlap (AQI is built from PM2.5 and PM10), so each drop understates that group&rsquo;s importance.</p>
 
   <h3>Calibration</h3>
   <div class="chartbox"><canvas id="chartRel"></canvas></div>
   <p class="small">Validation reliability diagram: points near the diagonal mean a predicted probability matches the real share of bad days.</p>
 </section>
 
-<!-- ============ TIMELINE ============ -->
-<section id="timeline" class="reveal">
-  <h2><i>08</i> Interactive: city timeline (2019)</h2>
-  <p>Pick a city to see the model's predicted probability for each day of the 2019 test year (logistic regression). Shaded columns are days that were <b>actually</b> followed by a bad-air day. Each point is a day a prediction was made, for the next day.</p>
-  <div class="controls">
-    <label>City <select id="tlcity"></select></label>
-    <label class="check"><input type="checkbox" id="tluse"> use my slider threshold (otherwise the frozen one)</label>
-  </div>
-  <p id="tlsummary" class="callout"></p>
-  <div class="chartbox tall"><canvas id="chartTimeline"></canvas></div>
-  <p class="legend"><span class="dot green"></span>caught bad day <span class="dot red"></span>missed bad day <span class="dot amber"></span>false alarm</p>
-</section>
-
 <!-- ============ 8. ERRORS ============ -->
 <section id="errors" class="reveal">
-  <h2><i>09</i> Errors</h2>
+  <h2><i>08</i> Errors</h2>
   <p>All error analysis uses validation predictions only (2017&ndash;2018). The test year was not used.</p>
   <ul>
     <li>Of 8,736 rows, <b>520</b> were missed bad days and <b>90</b> were false alarms, about 6 misses per false alarm. This is expected at a threshold set for 80% recall.</li>
@@ -386,7 +379,7 @@
 
 <!-- ============ 9. LIMITATIONS ============ -->
 <section id="limitations" class="reveal">
-  <h2><i>10</i> Limitations</h2>
+  <h2><i>09</i> Limitations</h2>
   <ul>
     <li><b>No weather data.</b> Wind and rain strongly affect pollution, so sudden flips are mostly missed.</li>
     <li><b>Mostly follows today's AQI.</b> The gain over persistence is real but modest, and over the single-feature rule it is small.</li>
@@ -404,16 +397,16 @@
 
 <!-- ============ 10. CONCLUSION ============ -->
 <section id="conclusion" class="reveal">
-  <h2><i>11</i> Conclusion</h2>
+  <h2><i>10</i> Conclusion</h2>
   <p>We chose logistic regression, following the rule we wrote before the results: the SVM was not clearly better, and logistic regression is simpler and easier to explain.</p>
   <p>Against persistence, it raises far fewer false alarms at the frozen threshold, and gives about 6.7 points higher precision at equal recall. Its main weakness is that it catches only about 10% of days when clean air turns bad, probably because there is no weather data. Since a missed warning costs more than a false alarm, a lower threshold (try the explorer) is the sensible way to run it. A modest, honestly measured gain over a strong baseline is the result.</p>
 </section>
 
 <!-- ============ 11. REPRODUCE ============ -->
 <section id="reproduce" class="reveal">
-  <h2><i>12</i> Reproduce, code and disclosure</h2>
+  <h2><i>11</i> Reproduce, code and disclosure</h2>
   <ol>
-    <li><b>Get the data.</b> The raw file is not in our repository, and the scripts do not download it on their own. Download <code>city_day.csv</code> from the Kaggle page and put it in <code>data/raw/</code>, or run <code>python src/download_data.py</code>, which needs your own free Kaggle account and API token (<code>kaggle.json</code>, never committed).</li>
+    <li><b>Get the data.</b> The raw file is not in our repository, and the scripts do not download it on their own. Download <code>city_day.csv</code> from the Kaggle page and put it in <code>data/raw/</code>. A free Kaggle account is needed; never commit <code>kaggle.json</code> or the raw data.</li>
     <li>Create a virtual environment and install <code>requirements.txt</code>.</li>
     <li>Run the scripts in the order given in the README. The split dates, embargo days and frozen settings are in the repository.</li>
     <li>Run the final test and the equal-recall check once, with <code>outputs/results/frozen_settings.json</code> unchanged.</li>
@@ -421,8 +414,8 @@
   <p class="small">Split dates: train 2015-01-01 to 2018-12-30; test 2019-01-01 to 2019-12-30; 2020 pre-lockdown to 2020-03-23; lockdown 2020-03-25 to 2020-07-01. Embargo days: 2018-12-31, 2019-12-31, 2020-03-24.</p>
 
   <div class="grid2">
-    <div class="mini"><b>Repository</b><span><a href="https://github.com/ayushi2577/Air-quality">github.com/ayushi2577/Air-quality</a>: code, notebooks, split and fold definitions, all result tables and figures, README, <code>LICENSE.md</code>, <code>CONTRIBUTION.md</code>.</span></div>
-    <div class="mini"><b>AI-use disclosure</b><span>We used Claude for brainstorming, drafting and explaining code, debugging, and drafting text. We ran every script ourselves, checked key numbers against each other and against our proposal, and can explain each result. Details: <code>AI_DISCLOSURE.md</code> in the repository.</span></div>
+    <div class="mini"><b>Repository</b><span><a href="https://github.com/ayushi2577/Air-quality">github.com/ayushi2577/Air-quality</a>: code, split and fold definitions, all result tables and figures, README, <code>LICENSE.md</code>.</span></div>
+    <div class="mini"><b>AI-use disclosure</b><span>We used ChatGPT to explore and compare options, and Claude for coding, debugging and drafting text. All decisions were ours: the question, the split, the features, the models and the model-choice rule. We ran every script, checked the key numbers against each other and our proposal, and can explain each result. Details: <code>AI_DISCLOSURE.md</code> in the repository.</span></div>
   </div>
 
   <h3>References</h3>

@@ -168,3 +168,10 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:2rem 1rem 3
 .chartbox.mid{height:320px}
 .matrix td{font-size:1.9rem;padding:.8rem .5rem}
 
+
+/* bottom copy of the threshold slider: stays at the bottom of the screen while the explorer is in view */
+.stickyctl{position:sticky;bottom:10px;z-index:15;display:flex;flex-wrap:wrap;align-items:center;gap:.8rem 1.2rem;
+  margin-top:1rem;padding:.7rem 1.1rem;border:1px solid var(--line);border-radius:14px;
+  background:rgba(7,11,20,.88);backdrop-filter:blur(12px)}
+.stickyctl label{display:flex;flex:1;min-width:220px;flex-direction:column;gap:.3rem;font-size:.82rem;color:var(--muted)}
+.stickyctl .small{margin:0;color:var(--muted)}
