@@ -241,7 +241,7 @@
     <li><b>Why not random.</b> Neighbouring days are almost the same, so a random split would let the model see the answer.</li>
     <li><b>Embargo day.</b> The last day before each cutoff is dropped, because its label (tomorrow's AQI) falls in the next period.</li>
     <li><b>Validation.</b> Four forward-chaining half-year folds inside 2015&ndash;2018, each training on all earlier dates. We built them from dates because scikit-learn's <code>TimeSeriesSplit</code> splits by row position and would mix cities.</li>
-    <li><b>Metrics.</b> PR-AUC is the main metric because only 26% of days are positive. We also report precision, recall, F1 and ROC-AUC. Accuracy is shown only to explain why it misleads.</li>
+    <li><b>Metrics.</b> PR-AUC is the main metric because only 26% of days are positive. In plain words, it measures how well the model ranks truly bad days above fine days across all possible thresholds: 1.0 is perfect, and a random guess scores about the bad-day rate (around 0.25). We also report precision, recall, F1 and ROC-AUC. Accuracy is shown only to explain why it misleads.</li>
     <li><b>Threshold.</b> Chosen on pooled validation as the highest precision with recall at least 80%, then frozen. It was never re-tuned on the test.</li>
     <li><b>Change (flip) days.</b> Days when today&rsquo;s status differs from tomorrow&rsquo;s, for example AQI 180 today and 230 tomorrow. Persistence is wrong on every one by construction, so they show what a model adds.</li>
     <li><b>Seen vs new cities.</b> Headline results use the 18 cities seen in training. The 8 never-seen cities are reported separately.</li>
