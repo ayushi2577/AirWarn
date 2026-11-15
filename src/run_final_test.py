@@ -14,6 +14,8 @@ RESULTS = ROOT / "outputs" / "results"
 DOCS_DATA = ROOT / "docs" / "data"
 cfg = json.load(open(RESULTS / "frozen_settings.json"))
 T = cfg["thresholds"]
+SF_C = cfg["single_feature_cutoff"]   # frozen on validation, never re-tuned
+SF_NAME = "Tuned single feature (AQI>%g)" % SF_C
 
 table = load_model_table()
 cols = model_columns(table)
@@ -45,6 +47,7 @@ def report(name, rows):
         ("Logistic regression", s_lr, (s_lr >= T["Logistic regression"]).astype(int)),
         ("RBF SVM (Platt)", s_svm, (s_svm >= T["RBF SVM (Platt)"]).astype(int)),
         ("Persistence", pers.astype(float), pers),
+        (SF_NAME, rows["AQI"].values, (rows["AQI"] > SF_C).astype(int).values),
     ]:
         m = metrics_at(y, pred)
         m["pr_auc"] = average_precision_score(y, s) if y.sum() else np.nan

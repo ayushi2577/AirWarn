@@ -186,7 +186,7 @@
   <div class="grid3">
     <div class="mini"><b>Majority</b><span>Always "not Poor". About 74% accuracy but zero bad days caught, which is why we do not use accuracy.</span></div>
     <div class="mini"><b>Persistence</b><span>Bad tomorrow if today's AQI is above 200. Assumes air quality changes slowly from one day to the next, which makes it strong. The main bar to beat.</span></div>
-    <div class="mini"><b>Tuned single feature</b><span>Bad tomorrow if today's AQI is above a cutoff chosen on validation (234). Assumes today's AQI alone carries the signal. Shows what the extra features add beyond it.</span></div>
+    <div class="mini"><b>Tuned single feature</b><span>Bad tomorrow if today's AQI is above a cutoff chosen on validation (234). Assumes today's AQI alone carries the signal. Shows what the extra features add beyond it. Scored on validation and on the 2019 test.</span></div>
   </div>
 
   <h3>Models</h3>
@@ -327,7 +327,7 @@
     <p><b>How to read it.</b></p>
     <p>1. At the frozen threshold, logistic regression has far higher precision than persistence (0.94 vs 0.85) but lower recall (0.78 vs 0.85). The validation target was 0.80. Recall drifted down because bad days were 33% of training but 22.6% of 2019.</p>
     <p>2. <b>Equal-recall check</b> (run after seeing the test, not used to change anything): at persistence's recall of 0.849, logistic regression reached precision 0.913 vs 0.847, a gain of <b>+6.7 points</b> (95% interval +5.0 to +8.6). The SVM gave +6.4 (+4.6 to +8.4). The gain is real but modest.</p>
-    <p>3. On validation, the tuned single-feature rule (AQI above 234) reached precision 0.944 at recall 0.80, against 0.959 for logistic regression. Most of the signal sits in today's AQI; the extra features add about 1.6 points. We did not score this rule on the test year.</p>
+    <p>3. <b>Tuned single-feature baseline</b> (bad if today's AQI is above 234, the cutoff frozen on validation and never re-tuned). On validation it reached precision 0.944 at recall 0.80 against 0.959 for logistic regression, a gap of about 1.6 points. On the 2019 test (seen cities) it scored precision 0.914, recall 0.749 and PR-AUC 0.934, against 0.940, 0.780 and 0.958 for logistic regression: about 2.4 points of PR-AUC from the extra features, with the 95% intervals for precision (0.887 to 0.940 vs 0.922 to 0.957) overlapping. Most of the signal sits in today's AQI; the extra features add a small, consistent gain. This rule was scored on the test after the other results (added in a final check, not used to change any choice).</p>
     <p>4. We chose logistic regression by a rule set before seeing results: pick the SVM only if it clearly wins in most folds. It did not (PR-AUC 0.958 vs 0.959 on the 2019 test), so we kept the simpler model.</p>
   </div>
 
@@ -382,7 +382,7 @@
   <h2><i>09</i> Limitations</h2>
   <ul>
     <li><b>No weather data.</b> Wind and rain strongly affect pollution, so sudden flips are mostly missed.</li>
-    <li><b>Mostly follows today's AQI.</b> The gain over persistence is real but modest, and over the single-feature rule it is small.</li>
+    <li><b>Mostly follows today's AQI.</b> The gain over persistence is real but modest, and over the tuned single-feature rule it is small (about 2.4 PR-AUC points on the 2019 test).</li>
     <li><b>Selection bias.</b> A row exists only when AQI was reported on both days. If sensors fail more on bad days, the days we use are not a random sample.</li>
     <li><b>Coverage.</b> 26 monitored cities, not all of India; stations do not represent whole cities; Mumbai's AQI is mostly blank; 8 cities never appear in training.</li>
     <li><b>Dataset AQI.</b> It was computed by the uploader, is uncapped and has implausible values. Our target (above 200) is not affected by the cap.</li>

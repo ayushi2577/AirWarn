@@ -16,7 +16,7 @@ Binary classification. One row = one city on one day *t*. Predictions use only i
 - Kaggle: "Air Quality Data in India (2015-2020)", `rohanrao/air-quality-data-in-india`, file `city_day.csv`.
 - Original source: Central Pollution Control Board (CPCB), Government of India.
 - 29,531 city-days, 26 cities, 2015-01-01 to 2020-07-01.
-- **The raw data is not included in this repository.** Check the Kaggle page for the licence.
+- **The raw data is not included in this repository.** Licence: CC0 (public domain) on the Kaggle page, see `LICENSE.md`.
 
 ### Getting the data
 
@@ -73,6 +73,7 @@ Seen cities: 18 (have rows in 2015-2018). New cities: 8 (never in training); rep
 | Logistic regression | 0.940 | 0.780 | 0.958 |
 | RBF SVM (Platt) | 0.941 | 0.783 | 0.959 |
 | Persistence | 0.847 | 0.849 | 0.754 |
+| Tuned single feature (AQI > 234, cutoff frozen on validation) | 0.914 | 0.749 | 0.934 |
 
 - At persistence's recall (0.849), logistic regression reached precision 0.913 vs 0.847 (+6.7 points, 95% interval +5.0 to +8.6). This check was run after seeing the test and was not used to change anything.
 - Recall on days where clean air turns bad is only about 10% (no weather data).
@@ -89,6 +90,7 @@ pip install -r requirements.txt
 Run from the project root, in this order (all scripts are in `src/`):
 
 ```
+python src/explore_data.py --csv data/raw/city_day.csv   # data summary and plots (outputs/data_summary.md)
 python src/data.py                  # counts check
 python src/splits.py                # split and fold counts
 python -m pytest tests -q           # no-future-leakage test
@@ -96,13 +98,15 @@ python src/baseline.py              # baselines on validation folds
 python src/models.py                # logistic regression vs baseline
 python src/run_svm.py               # SVM tuning grids
 python src/compare.py               # model-choice rule, Platt scaling
-python src/run_eval.py              # threshold sweep, freezes thresholds
+python src/run_eval.py              # threshold sweep, freezes thresholds and the single-feature cutoff
 python src/run_bootstrap.py         # confidence intervals
 python src/run_tables.py            # persistence comparison, per-city, reliability
 python src/run_regularization.py    # L1 vs L2
 python src/run_ablation.py          # feature-group ablation
 python src/run_errors.py            # error analysis
 ```
+
+Optional EDA notebook: `pip install jupyter`, then open `notebooks/01_eda.ipynb` (outputs are already saved in it).
 
 Final test, run **once**, after the frozen settings exist and without changing them:
 
@@ -115,6 +119,7 @@ python src/export_site_data.py      # writes docs/data/*.json for the website
 ## Repository layout
 
 ```
+notebooks/  01_eda.ipynb (data exploration; run from the project root after the data is in place)
 src/        code (data, splits, features, pipeline, evaluate, models, run_* scripts)
 tests/      no-future-leakage test
 outputs/    figures and results tables

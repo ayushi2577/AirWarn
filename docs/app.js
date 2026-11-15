@@ -63,8 +63,8 @@ loadJSON("data/thresholds.json").then(initExplorer).catch(()=>{
 /* ============ 2. final test explorer ============ */
 loadJSON("data/final_results.json").then(rows=>{
   const parts=[...new Set(rows.map(r=>r.part))];
-  const order=["Logistic regression","RBF SVM (Platt)","Persistence"];
-  const colors=[TEAL,VIOLET,GREY];
+  const order=["Logistic regression","RBF SVM (Platt)","Persistence","Tuned single feature (AQI>234)"];
+  const colors=[TEAL,VIOLET,GREY,AMBER];
   const tabs=document.getElementById("tabs");
   const chart=new Chart(document.getElementById("chartFinal"),{
     type:"bar",
@@ -82,7 +82,7 @@ loadJSON("data/final_results.json").then(rows=>{
     const pos=rs[0].positives;
     let h=`<tr><th>Model</th><th>Precision</th><th>Recall</th><th>F1</th><th>PR-AUC</th><th>Flip-day recall</th><th>Precision 95% CI</th><th>Recall 95% CI</th></tr>`;
     rs.forEach(r=>{
-      h+=`<tr class="${r.model==="Persistence"?"pers":""}"><td>${r.model}</td><td>${fmt(r.precision)}</td><td>${fmt(r.recall)}</td><td>${fmt(r.f1)}</td><td>${fmt(r.pr_auc)}</td><td>${fmt(r.change_day_recall)}</td><td>${r.precision_CI||"n/a"}</td><td>${r.recall_CI||"n/a"}</td></tr>`;
+      h+=`<tr class="${r.model==="Persistence"||r.model.startsWith("Tuned")?"pers":""}"><td>${r.model}</td><td>${fmt(r.precision)}</td><td>${fmt(r.recall)}</td><td>${fmt(r.f1)}</td><td>${fmt(r.pr_auc)}</td><td>${fmt(r.change_day_recall)}</td><td>${r.precision_CI||"n/a"}</td><td>${r.recall_CI||"n/a"}</td></tr>`;
     });
     document.getElementById("finaltable").innerHTML=h+
       `<caption class="small" style="caption-side:bottom;text-align:left">${rs[0].rows.toLocaleString()} rows, ${pos.toLocaleString()} bad days${pos<30?' <span class="warn">low reliability: fewer than 30 bad days, no intervals</span>':""}</caption>`;

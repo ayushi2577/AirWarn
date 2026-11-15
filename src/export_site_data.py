@@ -46,20 +46,4 @@ for name, s in [("Logistic regression", lr_val["score"].values),
     rel[name] = [{"pred": float(m), "actual": float(f)} for m, f in zip(mean, frac)]
 json.dump(rel, open(OUT / "reliability.json", "w"), indent=1)
 
-# 4. 2019 timeline (frozen logistic regression refit, same as the final test)
-train = between(get_eval_rows(table), *TRAIN)
-X_tr, y_tr = get_Xy(train)
-lr = make_logreg(cols).fit(X_tr[cols], y_tr)
-test = get_split(table, "test").reset_index(drop=True)
-X, _ = get_Xy(test)
-test["p"] = lr.predict_proba(X[cols])[:, 1]
-cities = {}
-for c, g in test.groupby("City"):
-    g = g.sort_values("Date")
-    cities[c] = {"seen": c in seen,
-                 "dates": g["Date"].dt.strftime("%Y-%m-%d").tolist(),
-                 "p": [round(float(v), 3) for v in g["p"]],
-                 "y": g["poor_tomorrow"].astype(int).tolist()}
-json.dump({"threshold": T["Logistic regression"], "cities": cities},
-          open(OUT / "timeline.json", "w"), separators=(",", ":"))
-print("Saved final_results.json, per_city.json, reliability.json, timeline.json")
+print("Saved final_results.json, per_city.json, reliability.json")

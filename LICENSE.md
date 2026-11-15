@@ -44,7 +44,7 @@ SOFTWARE.
 ### How the data is handled in this project
 
 - **The raw data is not redistributed.** `city_day.csv` is not committed to this repository. The README explains how to download it from Kaggle.
-- **Only derived summary outputs are published.** The website and `docs/data/` contain aggregate results (counts, precision, recall, per-city scores) and, for the timeline, model probabilities and yes/no labels. They do not contain the dataset's pollutant readings or AQI values.
+- **Only derived summary outputs are published.** The website and `docs/data/` contain aggregate results (counts, precision, recall, per-city scores). They do not contain the dataset's pollutant readings or AQI values.
 - **Use is non-commercial and educational**, for a university course project.
 - **Attribution:** data originates from CPCB monitoring stations and was compiled and uploaded to Kaggle by Rohan Rao. Anyone reusing this work should credit both and follow the terms on the Kaggle page.
 

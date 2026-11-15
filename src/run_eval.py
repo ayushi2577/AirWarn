@@ -88,32 +88,15 @@ summary.append({"model": "Persistence", "threshold": "AQI>200",
 summary = pd.DataFrame(summary)
 summary.to_csv(RESULTS / "frozen_summary_validation.csv", index=False)
 
+# Tuned single-feature baseline: AQI > c, c chosen on pooled validation only
+sf_cutoff = round(float(pick_threshold(y, lr_val["AQI"].values, 0.80)), 1)
+
 with open(RESULTS / "frozen_settings.json", "w") as f:
     json.dump({"thresholds": frozen,
+               "single_feature_cutoff": sf_cutoff,
                "svm_params": SVM_PARAMS,
                "platt_coef": float(platt.coef_[0][0]),
                "platt_intercept": float(platt.intercept_[0])}, f, indent=2)
 
 print(summary.round(3).to_string(index=False))
 print("\nSaved: outputs/results/ and outputs/figures/")
-
-def block_bootstrap(rows, y, score, pred, n_boot=500, seed=0):
-    """Resample whole calendar weeks (with replacement) and recompute metrics.
-    rows needs a 'Date' column. Returns {metric: (low, high)} 95% intervals."""
-    rng = np.random.default_rng(seed)
-    week = rows["Date"].dt.to_period("W").astype(str).values
-    y, score, pred = np.asarray(y), np.asarray(score), np.asarray(pred)
-    idx_by_week = {w: np.where(week == w)[0] for w in np.unique(week)}
-    weeks = list(idx_by_week)
-    out = {"precision": [], "recall": [], "pr_auc": []}
-    for _ in range(n_boot):
-        pick = rng.choice(len(weeks), size=len(weeks), replace=True)
-        idx = np.concatenate([idx_by_week[weeks[k]] for k in pick])
-        if y[idx].sum() == 0:
-            continue
-        m = metrics_at(y[idx], pred[idx])
-        out["precision"].append(m["precision"])
-        out["recall"].append(m["recall"])
-        out["pr_auc"].append(average_precision_score(y[idx], score[idx]))
-    return {k: (float(np.percentile(v, 2.5)), float(np.percentile(v, 97.5)))
-            for k, v in out.items()}

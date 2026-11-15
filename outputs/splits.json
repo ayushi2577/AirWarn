@@ -1,0 +1,77 @@
+{
+  "note": "Single source of truth is src/config.py. Dates are inclusive. Rows are kept only if today's and tomorrow's AQI are both observed.",
+  "target": "poor_tomorrow = 1 if AQI on day t+1 > 200 (looked up by date)",
+  "train": [
+    "2015-01-01",
+    "2018-12-30"
+  ],
+  "test_2019": [
+    "2019-01-01",
+    "2019-12-30"
+  ],
+  "stress_2020_pre_lockdown": [
+    "2020-01-01",
+    "2020-03-23"
+  ],
+  "stress_2020_lockdown": [
+    "2020-03-25",
+    "2020-07-01"
+  ],
+  "embargo_days_dropped": [
+    "2018-12-31",
+    "2019-12-31",
+    "2020-03-24"
+  ],
+  "validation_folds": [
+    {
+      "fold": 1,
+      "train": [
+        "2015-01-01",
+        "2016-12-30"
+      ],
+      "validate": [
+        "2017-01-01",
+        "2017-06-30"
+      ]
+    },
+    {
+      "fold": 2,
+      "train": [
+        "2015-01-01",
+        "2017-06-29"
+      ],
+      "validate": [
+        "2017-07-01",
+        "2017-12-31"
+      ]
+    },
+    {
+      "fold": 3,
+      "train": [
+        "2015-01-01",
+        "2017-12-30"
+      ],
+      "validate": [
+        "2018-01-01",
+        "2018-06-30"
+      ]
+    },
+    {
+      "fold": 4,
+      "train": [
+        "2015-01-01",
+        "2018-06-29"
+      ],
+      "validate": [
+        "2018-07-01",
+        "2018-12-30"
+      ]
+    }
+  ],
+  "seen_cities_rule": "cities with at least one usable row in 2015-2018 (18 cities); the other 8 are 'new cities'",
+  "bootstrap": {
+    "unit": "calendar week",
+    "n_boot": 500,
+    "seed": 0
+  }
+}

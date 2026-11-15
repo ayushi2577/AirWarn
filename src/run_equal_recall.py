@@ -47,7 +47,8 @@ weeks = list(idx_by_week)
 rng = np.random.default_rng(0)
 
 rows = []
-for name, s in [("Logistic regression", s_lr), ("RBF SVM", s_svm)]:
+for name, s in [("Logistic regression", s_lr), ("RBF SVM", s_svm),
+                ("Tuned single feature (AQI)", test["AQI"].values)]:
     point = prec_at(y, s, pm["recall"])
     diffs = []
     for _ in range(500):

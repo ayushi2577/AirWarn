@@ -1,3 +1,4 @@
 model,precision_at_persistence_recall,persistence_precision,gain,gain_95%_interval
 Logistic regression,0.913,0.847,0.067,+0.050 to +0.086
 RBF SVM,0.911,0.847,0.064,+0.046 to +0.084
+Tuned single feature (AQI),0.847,0.847,0.0,+0.000 to +0.000
