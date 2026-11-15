@@ -147,3 +147,24 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;padding:2rem 1rem 3
 .acc .row.open .panel{display:block;animation:fade .25s ease}
 .acc .panel p{margin:.2rem 0}
 @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* ---- threshold explorer layout ---- */
+.explorer{display:grid;grid-template-columns:360px 1fr;gap:1.6rem;align-items:start;margin-top:1rem}
+.explorer2{display:grid;grid-template-columns:1.5fr 1fr;gap:1.6rem;align-items:start;margin-top:1.6rem}
+@media(max-width:1000px){.explorer,.explorer2{grid-template-columns:1fr}}
+.explorer h4,.explorer2 h4{margin:0 0 .6rem;font-size:1rem;color:var(--teal)}
+.side,.mainchart,.howto{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem}
+.explorer2>div:first-child{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem}
+.chartbox.big{height:400px}
+.matrix td{font-size:2.1rem;padding:.9rem .6rem}
+.matrix th{font-size:.8rem}
+.howto ol{padding-left:1.2rem;margin:0}
+.howto li{margin:.55rem 0;font-size:.9rem}
+
+.xgrid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem}
+@media(max-width:900px){.xgrid{grid-template-columns:1fr}}
+.panel2{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:1rem 1.2rem;min-width:0}
+.panel2 h4{margin:0 0 .6rem;font-size:1rem;color:var(--teal)}
+.chartbox.mid{height:320px}
+.matrix td{font-size:1.9rem;padding:.8rem .5rem}
+

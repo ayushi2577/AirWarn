@@ -311,3 +311,113 @@ document.addEventListener("click",e=>{
   const row=head.parentElement, open=row.classList.toggle("open");
   const b=head.querySelector(".chev"); if(b) b.setAttribute("aria-expanded",open);
 });
+
+function initExplorer(d){
+  const dsSel=document.getElementById("dataset"), modelSel=document.getElementById("model"),
+        slider=document.getElementById("t");
+  const names=Object.keys(d.validation);
+  names.forEach(n=>modelSel.add(new Option(n,n)));
+  if(!d.test_2019_seen) dsSel.querySelector('option[value="test_2019_seen"]').disabled=true;
+  const rows=()=>d[dsSel.value][modelSel.value];
+  const pers=()=>dsSel.value==="validation"?d.persistence:d.persistence_test_2019_seen;
+  const nearest=(r,t)=>r.reduce((a,b)=>Math.abs(b.threshold-t)<Math.abs(a.threshold-t)?b:a);
+  STATE.frozen=d.frozen_thresholds[names[0]]; STATE.model=names[0];
+
+  /* 2. precision and recall vs threshold, with live dots on both curves */
+  const thr=new Chart(document.getElementById("chartThreshold"),{
+    type:"scatter",
+    data:{datasets:[
+      {label:"Precision",borderColor:TEAL,backgroundColor:TEAL,showLine:true,pointRadius:0,tension:.25,data:[]},
+      {label:"Recall",borderColor:AMBER,backgroundColor:AMBER,showLine:true,pointRadius:0,tension:.25,data:[]},
+      {label:"Precision here",borderColor:"#fff",backgroundColor:TEAL,pointRadius:8,data:[]},
+      {label:"Recall here",borderColor:"#fff",backgroundColor:AMBER,pointRadius:8,data:[]}]},
+    options:{animation:false,
+      plugins:{vlines:{lines:[]},legend:{labels:{boxWidth:10,filter:i=>i.datasetIndex<2}},
+        tooltip:{filter:i=>i.datasetIndex<2}},
+      scales:{x:{type:"linear",min:.05,max:.95,title:{display:true,text:"threshold"}},
+              y:{min:0,max:1}}}
+  });
+
+  /* 3. precision-recall curve, with guide lines from the dot to both axes */
+  const pr=new Chart(document.getElementById("chartPR"),{
+    type:"scatter",
+    data:{datasets:[
+      {label:"Model",borderColor:TEAL,backgroundColor:TEAL,showLine:true,pointRadius:0,data:[]},
+      {label:"Persistence",pointStyle:"star",pointRadius:11,borderColor:ROSE,backgroundColor:ROSE,data:[]},
+      {label:"Your threshold",pointRadius:9,pointHoverRadius:11,borderColor:"#fff",backgroundColor:AMBER,data:[]},
+      {label:"g1",showLine:true,borderColor:"rgba(251,191,36,.7)",borderDash:[5,5],borderWidth:1.5,pointRadius:0,data:[]},
+      {label:"g2",showLine:true,borderColor:"rgba(251,191,36,.7)",borderDash:[5,5],borderWidth:1.5,pointRadius:0,data:[]}]},
+    options:{animation:false,
+      plugins:{legend:{labels:{boxWidth:10,filter:i=>i.datasetIndex<3}},
+        tooltip:{mode:"nearest",intersect:true,filter:i=>i.datasetIndex<3,
+          callbacks:{label:c=>`${c.dataset.label}: recall ${fmt(c.parsed.x)}, precision ${fmt(c.parsed.y)}`}}},
+      scales:{x:{type:"linear",min:0,max:1,title:{display:true,text:"recall"}},
+              y:{min:0,max:1,title:{display:true,text:"precision"}}}}
+  });
+
+  /* 4. outcome bars: caught vs missed, right warnings vs false alarms */
+  const out=new Chart(document.getElementById("chartOutcome"),{
+    type:"bar",
+    data:{labels:["Real bad days","Warnings issued"],datasets:[
+      {label:"Caught",backgroundColor:TEAL,borderRadius:4,data:[0,0]},
+      {label:"Missed",backgroundColor:ROSE,borderRadius:4,data:[0,0]},
+      {label:"False alarms",backgroundColor:AMBER,borderRadius:4,data:[0,0]}]},
+    options:{indexAxis:"y",animation:{duration:150},
+      plugins:{legend:{labels:{boxWidth:10}}},
+      scales:{x:{stacked:true,title:{display:true,text:"number of days"}},
+              y:{stacked:true}}}
+  });
+
+  function setT(v){
+    v=Math.max(.05,Math.min(.95,Math.round(v*100)/100));
+    slider.value=v; draw();
+  }
+  const cv=document.getElementById("chartThreshold"); let down=false;
+  const fromEvent=e=>setT(thr.scales.x.getValueForPixel(e.clientX-cv.getBoundingClientRect().left));
+  cv.addEventListener("pointerdown",e=>{down=true;cv.setPointerCapture(e.pointerId);fromEvent(e);});
+  cv.addEventListener("pointermove",e=>{if(down)fromEvent(e);});
+  cv.addEventListener("pointerup",()=>down=false);
+
+  function draw(){
+    const name=modelSel.value, t=parseFloat(slider.value), rs=rows(), r=nearest(rs,t), f=d.frozen_thresholds[name];
+    STATE.t=t; STATE.model=name; STATE.frozen=f;
+    document.getElementById("tval").textContent=t.toFixed(2);
+    ["TP","FP","FN","TN"].forEach(k=>document.getElementById(k.toLowerCase()).textContent=r[k].toLocaleString());
+    document.getElementById("prec").textContent=fmt(r.precision);
+    document.getElementById("rec").textContent=fmt(r.recall);
+    document.getElementById("precbar").style.width=(r.precision*100)+"%";
+    document.getElementById("recbar").style.width=(r.recall*100)+"%";
+    document.getElementById("frozen").textContent="Frozen threshold for this model: "+f.toFixed(3)+(Math.abs(f-t)<.006?"  (you are at it)":"");
+    document.getElementById("sentence").innerHTML=
+      `Of <b>${(r.TP+r.FN).toLocaleString()}</b> bad-air days, the warning catches <b>${r.TP.toLocaleString()}</b> and misses <b>${r.FN.toLocaleString()}</b>. It raises <b>${r.FP.toLocaleString()}</b> false alarms.`;
+    const p=pers();
+    document.getElementById("pers").textContent=`Persistence (tomorrow = today), same data: precision ${fmt(p.precision)}, recall ${fmt(p.recall)}.`;
+
+    thr.data.datasets[0].data=rs.map(x=>({x:x.threshold,y:x.precision}));
+    thr.data.datasets[1].data=rs.map(x=>({x:x.threshold,y:x.recall}));
+    thr.data.datasets[2].data=[{x:r.threshold,y:r.precision}];
+    thr.data.datasets[3].data=[{x:r.threshold,y:r.recall}];
+    thr.options.plugins.vlines.lines=[
+      {x:f,color:AMBER,dash:[6,5],label:"frozen"},
+      {x:r.threshold,color:"#ffffff",width:2}];
+    thr.update("none");
+
+    pr.data.datasets[0].label=name;
+    pr.data.datasets[0].data=rs.map(x=>({x:x.recall,y:x.precision}));
+    pr.data.datasets[1].data=[{x:p.recall,y:p.precision}];
+    pr.data.datasets[2].data=[{x:r.recall,y:r.precision}];
+    pr.data.datasets[3].data=[{x:r.recall,y:0},{x:r.recall,y:r.precision}];
+    pr.data.datasets[4].data=[{x:0,y:r.precision},{x:r.recall,y:r.precision}];
+    pr.update("none");
+
+    out.data.datasets[0].data=[r.TP,r.TP];
+    out.data.datasets[1].data=[r.FN,0];
+    out.data.datasets[2].data=[0,r.FP];
+    out.update();
+
+    if(STATE.onChange) STATE.onChange();
+  }
+  modelSel.onchange=draw; dsSel.onchange=draw; slider.oninput=draw;
+  document.getElementById("snap").onclick=()=>setT(d.frozen_thresholds[modelSel.value]);
+  slider.value=d.frozen_thresholds[names[0]]; draw();
+}

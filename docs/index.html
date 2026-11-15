@@ -207,9 +207,9 @@
     <tr><td>Precision at 80% recall, logistic regression</td><td>0.963</td><td>0.964</td><td>0.933</td><td>0.974</td><td><b>0.958</b></td></tr>
     <tr><td>Precision at 80% recall, RBF SVM</td><td>0.956</td><td>0.957</td><td>0.928</td><td>0.962</td><td>0.951</td></tr>
   </table></div>
-  <p class="small">The tuned linear SVM (C = 0.01) scored a mean PR-AUC of 0.9662. RBF SVM settings: C = 4, gamma = 0.003, after a second wider grid found nothing better.</p>
+  <p class="small">The tuned linear SVM (C = 0.01) scored a mean PR-AUC of 0.9662. RBF SVM settings: C = 4, gamma = 0.003, after a second wider grid found nothing better. Linear SVM was slightly below RBF, so RBF was carried forward.</p>
 
-  <p class="callout"><b>Model-choice rule, written before any results:</b> choose logistic regression unless the best SVM is better in most folds and clearly better on average. The SVM had slightly higher PR-AUC in 3 of 4 folds, but its mean gain (0.0018) was smaller than the fold-to-fold spread of the differences (0.0033). At 80% recall, logistic regression had higher precision in all 4 folds. <b>Logistic regression was chosen.</b></p>
+  <p class="callout"><b>How we chose between models? </b> We compared logistic regression with the best SVM on the same four validation folds, looking at the per-fold differences rather than only the average. Because fold scores vary by about 0.010, we only prefer the more complex model if it is better in most folds and clearly better on average; otherwise we prefer the simpler, easier-to-explain logistic regression. <b> Result: the SVM’s mean PR-AUC gain (0.0018) was smaller than the fold-to-fold spread of the differences (0.0033), and at 80% recall logistic regression had higher precision in all four folds, so we chose logistic regression. The 2019 test did not influence this choice </b></p>
 
   <h3>Regularization</h3>
   <div class="chartbox"><canvas id="chartReg"></canvas></div>
@@ -255,7 +255,8 @@
 <!-- ============ 6. SLIDER ============ -->
 <section id="slider" class="reveal">
   <h2><i>06</i> Interactive: threshold explorer</h2>
-  <p>Drag the slider, or <b>click and drag on the left chart</b>, to move the warning threshold. The confusion matrix, precision, recall and a plain-language sentence update live. The dashed line marks our <b>frozen threshold</b>, and persistence is shown for comparison. The 2019 view is for exploration only: moving the threshold does not change our reported result.</p>
+  <p>A warning system needs a cut-off: how sure must the model be before it warns? A <b>low</b> threshold warns often, so it catches more bad days but raises more false alarms. A <b>high</b> threshold warns rarely, so it is more precise but misses more bad days. The dashed amber line marks our <b>frozen threshold</b> (chosen on validation, never re-tuned). The 2019 view is for exploration only and does not change our reported result.</p>
+
   <div class="controls">
     <label>Data
       <select id="dataset">
@@ -270,8 +271,10 @@
     <button id="snap" type="button">Jump to frozen</button>
   </div>
   <p id="frozen" class="frozenline"></p>
-  <div class="dash">
-    <div class="matrixbox">
+
+  <div class="xgrid">
+    <div class="panel2">
+      <h4>1. What happens at this threshold</h4>
       <table class="matrix">
         <tr><th></th><th>Actually bad</th><th>Actually fine</th></tr>
         <tr><th>Warned</th><td id="tp" class="good"></td><td id="fp" class="bad"></td></tr>
@@ -281,12 +284,26 @@
         <div><span>Precision</span><div class="bar"><i id="precbar"></i></div><b id="prec"></b></div>
         <div><span>Recall</span><div class="bar"><i id="recbar" class="amber"></i></div><b id="rec"></b></div>
       </div>
+      <p class="small"><b>Precision:</b> of the days we warn, how many were really bad. <b>Recall:</b> of the really bad days, how many we caught. Green = right call, red = a miss or a false alarm.</p>
+    </div>
+
+    <div class="panel2">
+      <h4>2. Precision and recall vs threshold</h4>
+      <div class="chartbox mid"><canvas id="chartThreshold"></canvas></div>
+      <p class="small">Click or drag on the chart to move the white line.</p>
+    </div>
+
+    <div class="panel2">
+      <h4>3. Precision&ndash;recall curve</h4>
+      <div class="chartbox mid"><canvas id="chartPR"></canvas></div>
+      <p class="small">Each point is one threshold; the amber dot is yours. Closer to the top right is better. The pink star is persistence ("tomorrow = today"): where the curve passes above it at the same recall, the model has fewer false alarms.</p>
+    </div>
+
+    <div class="panel2">
+      <h4>4. What the warnings look like</h4>
+      <div class="chartbox mid"><canvas id="chartOutcome"></canvas></div>
       <p id="sentence" class="callout"></p>
       <p id="pers" class="small"></p>
-    </div>
-    <div class="charts2">
-      <div class="chartbox"><canvas id="chartThreshold"></canvas></div>
-      <div class="chartbox"><canvas id="chartPR"></canvas></div>
     </div>
   </div>
 </section>
