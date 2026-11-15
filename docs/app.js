@@ -304,3 +304,10 @@ loadJSON("data/timeline.json").then(tl=>{
   const prev=STATE.onChange; STATE.onChange=()=>{ if(prev) prev(); if(use.checked) draw(); };
   draw();
 }).catch(()=>{ document.getElementById("tlsummary").textContent="Run src/export_site_data.py to create data/timeline.json"; });
+
+/* expandable rows: click anywhere on the row header */
+document.addEventListener("click",e=>{
+  const head=e.target.closest(".acc .head"); if(!head) return;
+  const row=head.parentElement, open=row.classList.toggle("open");
+  const b=head.querySelector(".chev"); if(b) b.setAttribute("aria-expanded",open);
+});
