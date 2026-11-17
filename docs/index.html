@@ -79,48 +79,97 @@
   </div>
 
   <h3>Variables: what each is, how much is missing, and how we handled it</h3>
-  <p class="small">Bars show the share of rows that are blank in the raw file. Click the arrow on any row to see what we did.</p>
-  <div class="acc">
+  <p class="small">Each pill is filled from the left in proportion to how much of that column is <b>present</b> in the raw file (the rest is blank). Click the <b>i</b> on a pill to see what we did.</p>
+    <div class="pills">
+      <div class="pill" style="--p:38.7%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">Xylene</span><span class="pv">39%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for Xylene" title="Details">i</button>
+      <div class="pdetail" hidden data-title="Xylene" data-present="39" data-blank="61"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> dropped the column entirely. It is 61% blank and never measured in 14 cities, so filling it would mostly invent values.</p></div>
+    </div>
+      <div class="pill" style="--p:62.3%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">PM10</span><span class="pv">62%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for PM10" title="Details">i</button>
+      <div class="pdetail" hidden data-title="PM10" data-present="62" data-blank="38"><p><b>What it is:</b> coarse dust particles; never measured in Lucknow. <b>What we did:</b> filled gaps of up to 3 days with the city's last value, added a 0/1 "was missing" flag, filled what remained with the training median, clipped extreme values (the maximum is exactly 1,000, a likely sensor limit) at the training 99.5th percentile, and built lags and rolling averages.</p></div>
+    </div>
+      <div class="pill" style="--p:65.0%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">NH3</span><span class="pv">65%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for NH3" title="Details">i</button>
+      <div class="pdetail" hidden data-title="NH3" data-present="65" data-blank="35"><p><b>What it is:</b> ammonia, from farming and waste; never measured in Ahmedabad. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, capping. The flag lets the model tell "not measured" from "low".</p></div>
+    </div>
+      <div class="pill" style="--p:72.8%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">Toluene</span><span class="pv">73%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for Toluene" title="Details">i</button>
+      <div class="pdetail" hidden data-title="Toluene" data-present="73" data-blank="27"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, capping.</p></div>
+    </div>
+      <div class="pill" style="--p:81.0%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">Benzene</span><span class="pv">81%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for Benzene" title="Details">i</button>
+      <div class="pdetail" hidden data-title="Benzene" data-present="81" data-blank="19"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, and capping (values reach 455, far above typical readings).</p></div>
+    </div>
+      <div class="pill hl" style="--p:84.1%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">AQI</span><span class="pv">84%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for AQI" title="Details">i</button>
+      <div class="pdetail" hidden data-title="AQI" data-present="84" data-blank="16"><p><b>What it is:</b> one index computed from the pollutants (higher is worse); <code>AQI_Bucket</code> is its category and is not used as an input. <b>What we did:</b> a row is used only if today's and tomorrow's AQI are both actually observed, so the target and the persistence baseline never rest on a filled-in value. Lags and averages may use values forward-filled for up to 3 days. As an input it is capped at the training 99.5th percentile.</p></div>
+    </div>
+      <div class="pill" style="--p:84.4%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">PM2.5</span><span class="pv">84%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for PM2.5" title="Details">i</button>
+      <div class="pdetail" hidden data-title="PM2.5" data-present="84" data-blank="16"><p><b>What it is:</b> fine particles, the most harmful kind. <b>What we did:</b> 3-day forward-fill, training-median fill, capping (values reach 950), lags at 1, 2, 3 and 7 days, and 3- and 7-day rolling averages.</p></div>
+    </div>
+      <div class="pill" style="--p:85.8%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">NOx</span><span class="pv">86%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for NOx" title="Details">i</button>
+      <div class="pdetail" hidden data-title="NOx" data-present="86" data-blank="14"><p><b>What it is:</b> nitrogen oxides, mainly from vehicles. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div>
+    </div>
+      <div class="pill" style="--p:86.4%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">O3</span><span class="pv">86%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for O3" title="Details">i</button>
+      <div class="pdetail" hidden data-title="O3" data-present="86" data-blank="14"><p><b>What it is:</b> ozone, formed in sunlight. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div>
+    </div>
+      <div class="pill" style="--p:86.9%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">SO2</span><span class="pv">87%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for SO2" title="Details">i</button>
+      <div class="pdetail" hidden data-title="SO2" data-present="87" data-blank="13"><p><b>What it is:</b> sulphur dioxide, from coal and industry. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div>
+    </div>
+      <div class="pill" style="--p:87.9%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">NO2</span><span class="pv">88%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for NO2" title="Details">i</button>
+      <div class="pdetail" hidden data-title="NO2" data-present="88" data-blank="12"><p><b>What it is:</b> a gas from vehicles and burning fuel. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div>
+    </div>
+      <div class="pill" style="--p:87.9%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">NO</span><span class="pv">88%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for NO" title="Details">i</button>
+      <div class="pdetail" hidden data-title="NO" data-present="88" data-blank="12"><p><b>What it is:</b> nitric oxide, from vehicles. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div>
+    </div>
+      <div class="pill" style="--p:93.0%">
+      <div class="liq"></div>
+      <div class="ptxt"><span class="pn">CO</span><span class="pv">93%</span></div>
+      <button class="pinfo" type="button" aria-label="Details for CO" title="Details">i</button>
+      <div class="pdetail" hidden data-title="CO" data-present="93" data-blank="7"><p><b>What it is:</b> carbon monoxide, from incomplete burning. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling. It is the least-missing pollutant.</p></div>
+    </div>
+    </div>
 
-    <div class="row"><div class="head"><span class="nm">Xylene</span><div class="trk"><i style="width:61.3%"></i></div><b>61%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> dropped the column entirely. It is 61% blank and never measured in 14 cities, so filling it would mostly invent values.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">PM10</span><div class="trk"><i style="width:37.7%"></i></div><b>38%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> coarse dust particles; never measured in Lucknow. <b>What we did:</b> filled gaps of up to 3 days with the city's last value, added a 0/1 "was missing" flag, filled what remained with the training median, clipped extreme values (the maximum is exactly 1,000, a likely sensor limit) at the training 99.5th percentile, and built lags and rolling averages.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">NH3</span><div class="trk"><i style="width:35.0%"></i></div><b>35%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> ammonia, from farming and waste; never measured in Ahmedabad. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, capping. The flag lets the model tell "not measured" from "low".</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">Toluene</span><div class="trk"><i style="width:27.2%"></i></div><b>27%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, capping.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">Benzene</span><div class="trk"><i style="width:19.0%"></i></div><b>19%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> a chemical from vehicles and industry. <b>What we did:</b> 3-day forward-fill, a "was missing" flag, training-median fill, and capping (values reach 455, far above typical readings).</p></div></div>
-
-    <div class="row hl"><div class="head"><span class="nm">AQI</span><div class="trk"><i style="width:15.9%"></i></div><b>16%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> one index computed from the pollutants (higher is worse); <code>AQI_Bucket</code> is its category and is not used as an input. <b>What we did:</b> a row is used only if today's and tomorrow's AQI are both actually observed, so the target and the persistence baseline never rest on a filled-in value. Lags and averages may use values forward-filled for up to 3 days. As an input it is capped at the training 99.5th percentile.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">PM2.5</span><div class="trk"><i style="width:15.6%"></i></div><b>16%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> fine particles, the most harmful kind. <b>What we did:</b> 3-day forward-fill, training-median fill, capping (values reach 950), lags at 1, 2, 3 and 7 days, and 3- and 7-day rolling averages.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">NOx</span><div class="trk"><i style="width:14.2%"></i></div><b>14%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> nitrogen oxides, mainly from vehicles. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">O3</span><div class="trk"><i style="width:13.6%"></i></div><b>14%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> ozone, formed in sunlight. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">SO2</span><div class="trk"><i style="width:13.1%"></i></div><b>13%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> sulphur dioxide, from coal and industry. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">NO2</span><div class="trk"><i style="width:12.1%"></i></div><b>12%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> a gas from vehicles and burning fuel. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">NO</span><div class="trk"><i style="width:12.1%"></i></div><b>12%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> nitric oxide, from vehicles. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling.</p></div></div>
-
-    <div class="row"><div class="head"><span class="nm">CO</span><div class="trk"><i style="width:7.0%"></i></div><b>7%</b><button class="chev" aria-expanded="false" aria-label="Details">&#9662;</button></div>
-    <div class="panel"><p><b>What it is:</b> carbon monoxide, from incomplete burning. <b>What we did:</b> 3-day forward-fill, training-median fill, capping, scaling. It is the least-missing pollutant.</p></div></div>
-
+  <h3>What the data looks like<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/data_summary.md" target="_blank" rel="noopener" title="outputs/data_summary.md" aria-label="Open outputs/data_summary.md in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/notebooks/01_eda.ipynb" target="_blank" rel="noopener" title="notebooks/01_eda.ipynb" aria-label="Open notebooks/01_eda.ipynb in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
+  <p class="small">Share of days that were bad-air days (AQI above 200) among the 24,343 rows we use. Hover a bar for the counts.</p>
+  <div class="edarow">
+    <figure><div class="cwrap"><canvas id="edaMonth" role="img" aria-label="Bad-air day share by month"></canvas></div>
+      <figcaption><b>By month.</b> Winter and post-monsoon are worst (about 46% in Jan, 47% in Nov); July is best (9%). This is why we use month and season.</figcaption></figure>
+    <figure><div class="cwrap"><canvas id="edaYear" role="img" aria-label="Bad-air day share by year"></canvas></div>
+      <figcaption><b>By year.</b> The share falls from 42% in 2015 to 23% in 2019 (the set of cities also changes; 2020 is Jan to early Jul only), so we split by time and expect drift.</figcaption></figure>
+    <figure><div class="cwrap"><canvas id="edaCity" role="img" aria-label="Bad-air day share by city, top 10"></canvas></div>
+      <figcaption><b>By city (top 10 of 26).</b> Ahmedabad 82% and Delhi 65%; many cities are under 10% and four have no bad days at all.</figcaption></figure>
   </div>
 
   <h3>Quality issues, and how we dealt with each</h3>

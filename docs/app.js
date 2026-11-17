@@ -1,3 +1,25 @@
+/* variable pills: info icon opens a pop-up with a blurred background */
+(function(){
+  const back=document.createElement("div");
+  back.className="mback"; back.setAttribute("role","dialog"); back.setAttribute("aria-modal","true");
+  back.innerHTML='<div class="mbox"><button class="mclose" type="button" aria-label="Close">&times;</button><h4></h4><p class="msub"></p><div class="mbody"></div></div>';
+  document.body.appendChild(back);
+  const h=back.querySelector("h4"), sub=back.querySelector(".msub"), body=back.querySelector(".mbody"), x=back.querySelector(".mclose");
+  let last=null;
+  function close(){ back.classList.remove("show"); if(last) last.focus(); }
+  document.addEventListener("click",e=>{
+    const b=e.target.closest(".pill .pinfo");
+    if(b){
+      const d=b.parentElement.querySelector(".pdetail"); last=b;
+      h.textContent=d.dataset.title;
+      sub.textContent=d.dataset.present+"% present, "+d.dataset.blank+"% blank in the raw file";
+      body.innerHTML=d.innerHTML; back.classList.add("show"); x.focus(); return;
+    }
+    if(e.target===back || e.target.closest(".mclose")) close();
+  });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape" && back.classList.contains("show")) close(); });
+})();
+
 /* ============ setup ============ */
 const TEAL="#2dd4bf", AMBER="#fbbf24", ROSE="#fb7185", VIOLET="#a78bfa", GREY="#7d8aa0";
 Chart.defaults.font.family="Inter, system-ui, sans-serif";
@@ -298,3 +320,21 @@ function initExplorer(d){
   document.getElementById("snap").onclick=()=>setT(d.frozen_thresholds[modelSel.value]);
   slider.value=d.frozen_thresholds[names[0]]; draw();
 }
+
+
+/* ============ small EDA charts (Data section) ============ */
+loadJSON("data/eda.json").then(d=>{
+  const mk=(id,blk,horizontal,color)=>{
+    const el=document.getElementById(id); if(!el) return;
+    const tip={callbacks:{label:c=>{const i=c.dataIndex; return `${c.parsed[horizontal?"x":"y"]}% bad days (${blk.positives[i].toLocaleString()} of ${blk.rows[i].toLocaleString()})`;}}};
+    const val={ticks:{callback:v=>v+"%"},beginAtZero:true,grid:{color:"rgba(255,255,255,.06)"}};
+    new Chart(el,{type:"bar",
+      data:{labels:blk.labels,datasets:[{data:blk.rate,backgroundColor:color,borderRadius:4,maxBarThickness:horizontal?14:28}]},
+      options:{indexAxis:horizontal?"y":"x",interaction:{mode:"nearest",intersect:true},
+        plugins:{legend:{display:false},tooltip:tip},
+        scales:horizontal?{x:val,y:{grid:{display:false},ticks:{font:{size:10},autoSkip:false}}}:{y:val,x:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  };
+  mk("edaMonth",d.month,false,TEAL);
+  mk("edaYear",d.year,false,VIOLET);
+  mk("edaCity",d.city,true,AMBER);
+}).catch(()=>{});
