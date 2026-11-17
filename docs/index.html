@@ -33,7 +33,7 @@
   </div>
   <p class="herolinks">
     <a class="cta" href="#slider">Try the threshold explorer &darr;</a>
-    <a class="ghost" href="https://github.com/ayushi2577/Air-quality">GitHub repository</a>
+    <a class="ghost" href="https://github.com/ayushi2577/AirWarn">GitHub repository</a>
     <a class="ghost" href="#reproduce">AI-use disclosure</a>
     <a class="ghost" href="#reproduce">Data licence</a>
   </p>
@@ -50,7 +50,7 @@
   <div class="tablewrap"><table>
     <tr><th>Element</th><th>Definition</th></tr>
     <tr><td><b>One row (unit)</b></td><td>One city on one day <i>t</i> (26 cities, 2015&ndash;2020).</td></tr>
-    <tr><td><b>Target</b></td><td><code>poor_tomorrow</code> = 1 if the city's AQI on day <i>t+1</i> is above 200, else 0. We chose 200 because it is the official CPCB boundary for "Poor", before seeing any results, and never adjusted it to improve scores. Tomorrow's value is found by looking up the same city's row dated exactly <i>t+1</i>, not the next row in the table (a missing day could otherwise make "the next row" several days later).</td></tr>
+    <tr><td><b>Target</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/data.py" target="_blank" rel="noopener" title="src/data.py" aria-label="Open src/data.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></td><td><code>poor_tomorrow</code> = 1 if the city's AQI on day <i>t+1</i> is above 200, else 0. We chose 200 because it is the official CPCB boundary for "Poor", before seeing any results, and never adjusted it to improve scores. Tomorrow's value is found by looking up the same city's row dated exactly <i>t+1</i>, not the next row in the table (a missing day could otherwise make "the next row" several days later).</td></tr>
     <tr><td><b>Task</b></td><td>Binary classification, about 26% positive.</td></tr>
     <tr><td><b>Prediction time</b></td><td>The end of day <i>t</i>, once that day's readings are in. The warning is for day <i>t+1</i>.</td></tr>
     <tr><td><b>Information available then</b></td><td>Day <i>t</i>'s pollutants and AQI; AQI, PM2.5 and PM10 from 1, 2, 3 and 7 days earlier; the average of the last 3 and last 7 days (counted back from today, never including tomorrow); today's AQI minus yesterday's (positive means getting worse); the month, the season and the day of the week; and which city it is.</td></tr>
@@ -70,7 +70,7 @@
 
 <!-- ============ 2. DATA ============ -->
 <section id="data" class="reveal">
-  <h2><i>02</i> Data</h2>
+  <h2><i>02</i> Data<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/data_summary.md" target="_blank" rel="noopener" title="outputs/data_summary.md" aria-label="Open outputs/data_summary.md in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/explore_data.py" target="_blank" rel="noopener" title="src/explore_data.py" aria-label="Open src/explore_data.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/notebooks/01_eda.ipynb" target="_blank" rel="noopener" title="notebooks/01_eda.ipynb" aria-label="Open notebooks/01_eda.ipynb in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h2>
   <p><b>Source:</b> Kaggle "Air Quality Data in India (2015&ndash;2020)" by Rohan Rao (<code>rohanrao/air-quality-data-in-india</code>), file <code>city_day.csv</code>. The original source is the Central Pollution Control Board (CPCB), Government of India. It is public and free with a Kaggle login. The raw file is not in our repository (see the reproduction section for how to get it).</p>
   <div class="grid3">
     <div class="mini"><b>29,531</b><span>city-days, 16 columns in the raw file</span></div>
@@ -150,12 +150,12 @@
 
   </div>
 
-  <p><b>Rows used.</b> We keep a row only if both today's and tomorrow's AQI are observed: <b>24,343 rows, 6,330 positive (26.0%)</b>. 4,656 rows lose their target because tomorrow's AQI is blank, 26 rows (each city's last day) have no next day, and 506 more are dropped because today's AQI is blank. Every model and baseline uses exactly these rows, so the persistence baseline always reads a real observation.</p>
+  <p><b>Rows used.</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/data.py" target="_blank" rel="noopener" title="src/data.py" aria-label="Open src/data.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> We keep a row only if both today's and tomorrow's AQI are observed: <b>24,343 rows, 6,330 positive (26.0%)</b>. 4,656 rows lose their target because tomorrow's AQI is blank, 26 rows (each city's last day) have no next day, and 506 more are dropped because today's AQI is blank. Every model and baseline uses exactly these rows, so the persistence baseline always reads a real observation.</p>
 </section>
 
 <!-- ============ 3. PREPROCESSING ============ -->
 <section id="preprocessing" class="reveal">
-  <h2><i>03</i> Preprocessing, and why</h2>
+  <h2><i>03</i> Preprocessing, and why<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/features.py" target="_blank" rel="noopener" title="src/features.py" aria-label="Open src/features.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/pipeline.py" target="_blank" rel="noopener" title="src/pipeline.py" aria-label="Open src/pipeline.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h2>
 
   <div class="callout">
     <p><b>How to read &ldquo;Fixed rule or fitted?&rdquo;</b> A <i>fixed rule</i> needs no numbers from the data (for example, copy yesterday&rsquo;s value into a blank). A <i>fitted</i> step calculates a number from data (median, 99.5% cap, scaling, city list), so we calculate it from <b>training rows only</b>. Otherwise 2019 would influence the numbers used to predict 2019. All fitted steps sit inside a scikit-learn <code>Pipeline</code>, which fits them on the training rows and only applies them to validation and test rows.</p>
@@ -176,27 +176,31 @@
     <tr><td>One-hot encoding</td><td>city, season, month, day of week</td><td>One 0/1 column per category</td><td>Unseen cities get all-zero columns instead of an error</td><td><b>Fitted on training rows only</b> (the list of categories)</td></tr>
   </table></div>
 
-  <p class="callout"><b>Leakage test.</b> An automated test rebuilds all features after deleting every row past a cutoff date and checks that no earlier value changes. It passes, which shows that no feature uses the future.</p>
+  <p class="callout"><b>Leakage test.</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/tests/test_no_future.py" target="_blank" rel="noopener" title="tests/test_no_future.py" aria-label="Open tests/test_no_future.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> An automated test rebuilds all features after deleting every row past a cutoff date and checks that no earlier value changes. It passes, which shows that no feature uses the future.</p>
 </section>
 
 <!-- ============ 4. METHODS ============ -->
 <section id="methods" class="reveal">
   <h2><i>04</i> Baselines and models</h2>
-  <h3>Baselines</h3>
+  <h3>Baselines<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/baseline.py" target="_blank" rel="noopener" title="src/baseline.py" aria-label="Open src/baseline.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <div class="grid3">
     <div class="mini"><b>Majority</b><span>Always "not Poor". About 74% accuracy but zero bad days caught, which is why we do not use accuracy.</span></div>
     <div class="mini"><b>Persistence</b><span>Bad tomorrow if today's AQI is above 200. Assumes air quality changes slowly from one day to the next, which makes it strong. The main bar to beat.</span></div>
     <div class="mini"><b>Tuned single feature</b><span>Bad tomorrow if today's AQI is above a cutoff chosen on validation (234). Assumes today's AQI alone carries the signal. Shows what the extra features add beyond it. Scored on validation and on the 2019 test.</span></div>
   </div>
 
-  <h3>Models</h3>
+  <p class="callout"><b>Why change days matter.</b> Persistence is right on 92.8% of rows (22,595 of 24,343) because air quality changes slowly. The other <b>1,748 rows (7.2%) are &ldquo;change days&rdquo;</b>, where today&rsquo;s bad/not-bad status differs from tomorrow&rsquo;s, and persistence is wrong on every one by construction. That is where a model can add value. Result: on the 2019 test (seen cities) logistic regression catches about <b>10%</b> of clean-to-bad flips, persistence <b>0%</b>. Small, but not zero, and it is why we report change days separately.</p>
+
+  <h3>Models<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/models.py" target="_blank" rel="noopener" title="src/models.py" aria-label="Open src/models.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <ul>
     <li><b>Logistic regression:</b> a weighted sum of the features turned into a probability, trained by minimizing cross-entropy loss. We use it because it gives probabilities (needed for a threshold), is easy to interpret, and fits a warning system. Assumes each feature shifts the odds of a bad day in a straight-line way. L2 penalty, C = 1.</li>
     <li><b>Linear SVM:</b> finds the widest-margin straight boundary using hinge loss. Expected to behave much like logistic regression. Assumes the classes can be separated by a straight boundary.</li>
-    <li><b>RBF SVM:</b> a curved boundary through a kernel. One exact fit took 3 seconds on about 10,000 rows, so we used the exact kernel and did not need the Nystroem approximation. Platt scaling turns its scores into probabilities. Assumes a smooth, curved boundary can separate the classes.</li>
+    <li><b>RBF SVM:</b> a curved boundary through a kernel. One exact fit took 3 seconds on about 10,000 rows, so we used the exact kernel and did not need the Nystroem approximation. Platt scaling turns its scores into probabilities; it is fitted on the pooled validation scores only, never on the test year. Assumes a smooth, curved boundary can separate the classes.</li>
   </ul>
 
-  <h3>Validation comparison (4 forward-chaining folds)</h3>
+  <p class="callout"><b>Gradient check.</b> For logistic regression we derived the loss and gradient by hand: cross-entropy <code>&minus;[y&middot;log p + (1&minus;y)&middot;log(1&minus;p)]</code> with <code>p = sigmoid(Xw + b)</code>, whose gradient is <code>X&#7488;(p &minus; y)/n</code>. We trained it with plain NumPy gradient descent on the training rows and compared with scikit-learn: objective <b>0.167417 vs 0.167425</b>, and <b>99.89%</b> identical yes/no decisions.<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/gradient_check.py" target="_blank" rel="noopener" title="src/gradient_check.py" aria-label="Open src/gradient_check.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></p>
+
+  <h3>Validation comparison (4 forward-chaining folds)<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_svm.py" target="_blank" rel="noopener" title="src/run_svm.py" aria-label="Open src/run_svm.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/compare.py" target="_blank" rel="noopener" title="src/compare.py" aria-label="Open src/compare.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <div class="tablewrap"><table>
     <tr><th></th><th>Fold 1</th><th>Fold 2</th><th>Fold 3</th><th>Fold 4</th><th>Mean</th></tr>
     <tr><td>PR-AUC, logistic regression</td><td>0.9675</td><td>0.9684</td><td>0.9513</td><td>0.9758</td><td><b>0.9657</b></td></tr>
@@ -208,14 +212,14 @@
 
   <p class="callout"><b>How we chose between models? </b> We compared logistic regression with the best SVM on the same four validation folds, looking at the per-fold differences rather than only the average. Because fold scores vary by about 0.010, we only prefer the more complex model if it is better in most folds and clearly better on average; otherwise we prefer the simpler, easier-to-explain logistic regression. <b> Result: the SVM’s mean PR-AUC gain (0.0018) was smaller than the fold-to-fold spread of the differences (0.0033), and at 80% recall logistic regression had higher precision in all four folds, so we chose logistic regression. The 2019 test did not influence this choice </b></p>
 
-  <h3>Regularization</h3>
+  <h3>Regularization<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_regularization.py" target="_blank" rel="noopener" title="src/run_regularization.py" aria-label="Open src/run_regularization.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <div class="chartbox"><canvas id="chartReg"></canvas></div>
   <p class="small">L1 and L2 differ by about 0.0002 in PR-AUC, far below the fold spread (about 0.010), so regularization does not change the comparison. For the SVM, C is its regularization and was tuned.</p>
 </section>
 
 <!-- ============ 5. EVALUATION ============ -->
 <section id="evaluation" class="reveal">
-  <h2><i>05</i> Evaluation design</h2>
+  <h2><i>05</i> Evaluation design<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/config.py" target="_blank" rel="noopener" title="src/config.py" aria-label="Open src/config.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/splits.py" target="_blank" rel="noopener" title="src/splits.py" aria-label="Open src/splits.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/splits.json" target="_blank" rel="noopener" title="outputs/splits.json" aria-label="Open outputs/splits.json in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h2>
 
   <div class="timeline-split">
     <div class="seg train" style="flex:4"><b>Train 2015&ndash;2018</b><span>13,024 rows &middot; 4,300 positive</span></div>
@@ -242,11 +246,11 @@
     <li><b>Embargo day.</b> The last day before each cutoff is dropped, because its label (tomorrow's AQI) falls in the next period.</li>
     <li><b>Validation.</b> Four forward-chaining half-year folds inside 2015&ndash;2018, each training on all earlier dates. We built them from dates because scikit-learn's <code>TimeSeriesSplit</code> splits by row position and would mix cities.</li>
     <li><b>Metrics.</b> PR-AUC is the main metric because only 26% of days are positive. In plain words, it measures how well the model ranks truly bad days above fine days across all possible thresholds: 1.0 is perfect, and a random guess scores about the bad-day rate (around 0.25). We also report precision, recall, F1 and ROC-AUC. Accuracy is shown only to explain why it misleads.</li>
-    <li><b>Threshold.</b> Chosen on pooled validation as the highest precision with recall at least 80%, then frozen. It was never re-tuned on the test.</li>
+    <li><b>Threshold.</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_eval.py" target="_blank" rel="noopener" title="src/run_eval.py" aria-label="Open src/run_eval.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/results/frozen_settings.json" target="_blank" rel="noopener" title="outputs/results/frozen_settings.json" aria-label="Open outputs/results/frozen_settings.json in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> Chosen on pooled validation as the highest precision with recall at least 80%, then frozen. It was never re-tuned on the test.</li>
     <li><b>Change (flip) days.</b> Days when today&rsquo;s status differs from tomorrow&rsquo;s, for example AQI 180 today and 230 tomorrow. Persistence is wrong on every one by construction, so they show what a model adds.</li>
     <li><b>Seen vs new cities.</b> Headline results use the 18 cities seen in training. The 8 never-seen cities are reported separately.</li>
-    <li><b>Uncertainty.</b> A block bootstrap resamples whole weeks, because consecutive days are correlated.</li>
-    <li><b>Test rule.</b> The test set was used once, after everything was frozen, and it never influenced a choice.</li>
+    <li><b>Uncertainty.</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/evaluate.py" target="_blank" rel="noopener" title="src/evaluate.py" aria-label="Open src/evaluate.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> A block bootstrap resamples whole weeks, because consecutive days are correlated.</li>
+    <li><b>Test rule.</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_final_test.py" target="_blank" rel="noopener" title="src/run_final_test.py" aria-label="Open src/run_final_test.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> The test set was used once, after everything was frozen, and it never influenced a choice.</li>
   </ul>
 </section>
 
@@ -258,8 +262,8 @@
   <div class="controls">
     <label>Data
       <select id="dataset">
-        <option value="test_2019_seen" selected>Test 2019, seen cities</option>
-        <option value="validation">Validation 2017&ndash;2018 (where the threshold was chosen)</option>
+        <option value="validation" selected>Validation 2017&ndash;2018 (where the threshold was chosen)</option>
+        <option value="test_2019_seen">Test 2019, seen cities (exploration only)</option>
       </select>
     </label>
     <label>Model <select id="model"></select></label>
@@ -317,7 +321,7 @@
 <section id="results" class="reveal">
   <h2><i>07</i> Results</h2>
   <p class="callout"><b>Result in one line:</b> on the 2019 test (seen cities), logistic regression reaches about 94% precision and 78% recall. At the same recall as &ldquo;tomorrow = today&rdquo;, it is about 6.7 points more precise. It mostly follows today&rsquo;s AQI and misses most sudden clean-to-bad jumps.</p>
-  <h3>Headline: 2019 test, 18 seen cities</h3>
+  <h3>Headline: 2019 test, 18 seen cities<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_final_test.py" target="_blank" rel="noopener" title="src/run_final_test.py" aria-label="Open src/run_final_test.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/results/final_test_results.csv" target="_blank" rel="noopener" title="outputs/results/final_test_results.csv" aria-label="Open outputs/results/final_test_results.csv in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <p>Frozen threshold, run once, 95% block-bootstrap intervals over weeks. Use the tabs to see new cities and the 2020 periods.</p>
   <div id="tabs" class="tabs"></div>
   <div class="chartbox"><canvas id="chartFinal"></canvas></div>
@@ -326,7 +330,7 @@
   <div class="callout">
     <p><b>How to read it.</b></p>
     <p>1. At the frozen threshold, logistic regression has far higher precision than persistence (0.94 vs 0.85) but lower recall (0.78 vs 0.85). The validation target was 0.80. Recall drifted down because bad days were 33% of training but 22.6% of 2019.</p>
-    <p>2. <b>Equal-recall check</b> (run after seeing the test, not used to change anything): at persistence's recall of 0.849, logistic regression reached precision 0.913 vs 0.847, a gain of <b>+6.7 points</b> (95% interval +5.0 to +8.6). The SVM gave +6.4 (+4.6 to +8.4). The gain is real but modest.</p>
+    <p>2. <b>Equal-recall check</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_equal_recall.py" target="_blank" rel="noopener" title="src/run_equal_recall.py" aria-label="Open src/run_equal_recall.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a> (run after seeing the test, not used to change anything): at persistence's recall of 0.849, logistic regression reached precision 0.913 vs 0.847, a gain of <b>+6.7 points</b> (95% interval +5.0 to +8.6). The SVM gave +6.4 (+4.6 to +8.4). The gain is real but modest.</p>
     <p>3. <b>Tuned single-feature baseline</b> (bad if today's AQI is above 234, the cutoff frozen on validation and never re-tuned). On validation it reached precision 0.944 at recall 0.80 against 0.959 for logistic regression, a gap of about 1.6 points. On the 2019 test (seen cities) it scored precision 0.914, recall 0.749 and PR-AUC 0.934, against 0.940, 0.780 and 0.958 for logistic regression: about 2.4 points of PR-AUC from the extra features, with the 95% intervals for precision (0.887 to 0.940 vs 0.922 to 0.957) overlapping. Most of the signal sits in today's AQI; the extra features add a small, consistent gain. This rule was scored on the test after the other results (added in a final check, not used to change any choice).</p>
     <p>4. We chose logistic regression by a rule set before seeing results: pick the SVM only if it clearly wins in most folds. It did not (PR-AUC 0.958 vs 0.959 on the 2019 test), so we kept the simpler model.</p>
   </div>
@@ -334,7 +338,7 @@
   <p><b>New cities (2019, 762 rows, 114 positive).</b> Precision stays high (0.92) but recall falls to 0.54, so transfer to a city the model has never seen is weaker.</p>
   <p><b>2020.</b> Even before lockdown, recall falls to 0.69 (precision 0.88). During lockdown there are only 22 positives in seen cities and 10 in new ones, so those numbers are too few to trust and we give no intervals.</p>
 
-  <h3>Per-city results</h3>
+  <h3>Per-city results<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/outputs/results/per_city_test_2019.csv" target="_blank" rel="noopener" title="outputs/results/per_city_test_2019.csv" aria-label="Open outputs/results/per_city_test_2019.csv in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <div class="controls">
     <label>Data <select id="citydata"><option value="test_2019">Test 2019 (seen cities)</option><option value="validation">Validation 2017&ndash;2018</option></select></label>
     <label>Metric <select id="citymetric"><option value="recall">Recall</option><option value="precision">Precision</option></select></label>
@@ -342,19 +346,19 @@
   <div class="chartbox tall"><canvas id="chartCity"></canvas></div>
   <p class="small">Recall is high in heavily polluted cities (Ahmedabad 0.94, Delhi 0.86 in 2019) and lower where bad days are rarer or less persistent (Brajrajnagar 0.56). Cities with fewer than 30 bad days are faded and unreliable; cities with none are omitted.</p>
 
-  <h3>Which information matters? Ablation (validation)</h3>
+  <h3>Which information matters? Ablation (validation)<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_ablation.py" target="_blank" rel="noopener" title="src/run_ablation.py" aria-label="Open src/run_ablation.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <p>One feature group removed at a time, logistic regression refitted on the same folds. The dashed line marks the fold-to-fold spread of PR-AUC (about 0.010); changes smaller than that are not distinguishable from noise.</p>
   <div class="chartbox"><canvas id="chartAblation"></canvas></div>
   <p>Particulates and recent AQI history matter most; gases, calendar and city add nothing measurable. This shows what the model uses, not what causes bad air. The groups overlap (AQI is built from PM2.5 and PM10), so each drop understates that group&rsquo;s importance.</p>
 
-  <h3>Calibration</h3>
+  <h3>Calibration<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_tables.py" target="_blank" rel="noopener" title="src/run_tables.py" aria-label="Open src/run_tables.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h3>
   <div class="chartbox"><canvas id="chartRel"></canvas></div>
   <p class="small">Validation reliability diagram: points near the diagonal mean a predicted probability matches the real share of bad days.</p>
 </section>
 
 <!-- ============ 8. ERRORS ============ -->
 <section id="errors" class="reveal">
-  <h2><i>08</i> Errors</h2>
+  <h2><i>08</i> Errors<a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/src/run_errors.py" target="_blank" rel="noopener" title="src/run_errors.py" aria-label="Open src/run_errors.py in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a></h2>
   <p>All error analysis uses validation predictions only (2017&ndash;2018). The test year was not used.</p>
   <ul>
     <li>Of 8,736 rows, <b>520</b> were missed bad days and <b>90</b> were false alarms, about 6 misses per false alarm. This is expected at a threshold set for 80% recall.</li>
@@ -414,8 +418,8 @@
   <p class="small">Split dates: train 2015-01-01 to 2018-12-30; test 2019-01-01 to 2019-12-30; 2020 pre-lockdown to 2020-03-23; lockdown 2020-03-25 to 2020-07-01. Embargo days: 2018-12-31, 2019-12-31, 2020-03-24.</p>
 
   <div class="grid2">
-    <div class="mini"><b>Repository</b><span><a href="https://github.com/ayushi2577/Air-quality">github.com/ayushi2577/Air-quality</a>: code, split and fold definitions, all result tables and figures, README, <code>LICENSE.md</code>.</span></div>
-    <div class="mini"><b>AI-use disclosure</b><span>We used ChatGPT to explore and compare options, and Claude for coding, debugging and drafting text. All decisions were ours: the question, the split, the features, the models and the model-choice rule. We ran every script, checked the key numbers against each other and our proposal, and can explain each result. Details: <code>AI_DISCLOSURE.md</code> in the repository.</span></div>
+    <div class="mini"><b>Repository</b><span><a href="https://github.com/ayushi2577/AirWarn">github.com/ayushi2577/AirWarn</a>: code, split and fold definitions, all result tables and figures, README, <code>LICENSE.md</code>.</span></div>
+    <div class="mini"><b>AI-use disclosure</b><a class="src" href="https://github.com/ayushi2577/AirWarn/blob/main/AI_DISCLOSURE.md" target="_blank" rel="noopener" title="AI_DISCLOSURE.md" aria-label="Open AI_DISCLOSURE.md in the repository"><svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" d="M6.5 9.5l3-3M7 4.5l1-1a2.6 2.6 0 013.7 3.7l-1 1M9 11.5l-1 1a2.6 2.6 0 01-3.7-3.7l1-1"/></svg></a><span>We used ChatGPT to explore and compare options, and Claude for coding, debugging and drafting text. All decisions were ours: the question, the split, the features, the models and the model-choice rule. We ran every script, checked the key numbers against each other and our proposal, and can explain each result. Details: <code>AI_DISCLOSURE.md</code> in the repository.</span></div>
   </div>
 
   <h3>References</h3>
