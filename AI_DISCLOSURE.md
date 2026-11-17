@@ -33,7 +33,6 @@
 - **Debugging:** helped investigate errors, import issues, warnings and compatibility problems.
 - **Concepts:** explained data leakage, embargo days, Platt scaling, probability calibration and temporal validation.
 - **Documentation:** helped with the README, website wording and this disclosure.
-- **Final audit (16 Nov):** Claude re-ran the pipeline against the raw data to check our numbers, suggested and drafted a small extra test-year row for the tuned single-feature baseline, an EDA notebook, and removal of the unused timeline export. We reviewed and ran these ourselves.
 - **Review and edits:** helped us understand the full project, checked the website against the course rubric, and edited the website files (an extra threshold slider, removal of duplicated and unused code, and shorter explanations).
 
 ## What we did ourselves
