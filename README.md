@@ -131,15 +131,14 @@ data/raw/   city_day.csv goes here (not committed)
 
 We worked as a pair and shared the work equally. Both of us can explain every part.
 
-| Area | Ayushi Agrawal | Pranjali Budhe |
-|---|---|---|
-| Question, data choice and proposal | Shared | Shared |
-| Data checks and EDA (`explore_data.py`, notebook) | Shared | Shared |
-| Features, preprocessing pipeline, leakage test | Shared | Shared |
-| Baselines, models, model-choice rule | Shared | Shared |
-| Evaluation design, thresholds, final test (run once) | Shared | Shared |
-| Error analysis, limitations | Shared | Shared |
-| Website, README and reproduction checks | Shared | Shared |
+## Contributions
+
+We worked as a pair and shared the work equally.
+
+| Name | Work done |
+|---|---|
+| **Ayushi Agrawal** (26120002) | Problem and target, features, baselines, logistic regression, splits and folds, website |
+| **Pranjali Budhe** (26120006) | Data checks and EDA, preprocessing and leakage test, SVMs, thresholds and final test, errors, README |
 
 ## Limitations
 
