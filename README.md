@@ -17,7 +17,7 @@
 ![Test set](https://img.shields.io/badge/test%20year-used%20once-critical)
 ![Data](https://img.shields.io/badge/data-CPCB%20via%20Kaggle-informational)
 
-**Ayushi Agrawal** (26120002) &nbsp;·&nbsp; **Pranjali Budhe** (26120006)
+**Ayushi Agrawal** (26120002) &nbsp;·&nbsp; **Pranjali Budhe** (26120006 )
 
 [Website](https://ayushi2577.github.io/AirWarn/) · [Results](#results) · [Quick start](#quick-start) · [Reproduce](#reproduce-everything) · [Limitations](#limitations) · [Contributions](#contributions)
 
