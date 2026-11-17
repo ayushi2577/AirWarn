@@ -126,11 +126,6 @@ outputs/    figures and results tables
 docs/       the website (GitHub Pages serves this folder)
 data/raw/   city_day.csv goes here (not committed)
 ```
-
-## Contributions
-
-We worked as a pair and shared the work equally. Both of us can explain every part.
-
 ## Contributions
 
 We worked as a pair and shared the work equally.
