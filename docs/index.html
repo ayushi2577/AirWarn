@@ -443,7 +443,7 @@
     <li><b>New cities.</b> Recall falls to 0.54 in 2019.</li>
     <li><b>2020 and the lockdown.</b> Performance already falls before lockdown, and the lockdown has only 32 positives.</li>
     <li><b>Correlated days.</b> The effective sample size is smaller than the row count.</li>
-    <li><b>Judgement calls.</b> Imputation and capping choices.</li>
+    <li><b>Preprocessing judgement calls, fixed in advance and not tested against alternatives.</b> We forward-filled gaps of at most 3 days (not compared with 1, 7 or no filling), filled remaining blanks with the training median (not compared with the mean or a model-based fill), capped values at the 99.5th percentile (not compared with 99%, 99.9% or no cap), dropped Xylene (61% blank), and added "was missing" flags for only four columns. Lags (1, 2, 3, 7 days) and rolling windows (3, 7 days) were also chosen up front, not searched. These choices were made without looking at the test year, but we did not measure how much they affect the results.</li>
     <li><b>We cannot claim</b> causation, performance in other cities or performance today, since the data ends in 2020.</li>
   </ul>
 </section>

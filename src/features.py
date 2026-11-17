@@ -1,10 +1,3 @@
-"""
-build_features sorts by city and date, so each city’s rows are in day order.
-It forward-fills short gaps within each city, then adds “was missing” flags from the raw values.
-It adds lags and rolling means (both look backwards only) and the change since yesterday.
-It adds month, day of week and season.
-group_of labels each column with its feature group, which you’ll need for Lasso and the ablation.
-"""
 import pandas as pd
 
 POLLUTANTS = ["PM2.5", "PM10", "NO", "NO2", "NOx", "NH3", "CO", "SO2",

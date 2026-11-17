@@ -1,16 +1,3 @@
-"""
-How the flow goes
-load_model_table merges the features with the target and the is_eval flag into one table.
-model_columns and get_Xy pick the inputs (features plus City) and the label. The target columns can never end up in X.
-PercentileCapper learns the 99.5th percentile of each column from the training rows, then clips later data to it. This is the capping rule from your plan.
-make_preprocessor runs these steps in order, all fitted on training rows only:
-cap extreme values,
-fill blanks with the training median,
-scale to a common range,
-pass the “was missing” flags through unchanged,
-one-hot City, season, month and day of week, with unknown cities getting all zeros.
-The __main__ block is only a sanity check, run on fold 1.
-"""
 import warnings
 import numpy as np
 import pandas as pd

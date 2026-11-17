@@ -50,7 +50,7 @@ SPLITS = {
     "train (2015-2018)": ("2015-01-01", "2018-12-30"),
     "test (2019)": ("2019-01-01", "2019-12-30"),
     "stress: 2020 pre-lockdown": ("2020-01-01", "2020-03-23"),
-    "stress: 2020 lockdown": ("2020-03-25", "2020-12-31"),
+    "stress: 2020 lockdown": ("2020-03-25", "2020-07-01"),
 }
 TRAIN_END = "2018-12-30"
 FOLDS = [  # forward-chaining validation folds inside the training years
