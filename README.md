@@ -81,10 +81,13 @@ The target is built by **date**, not by "next row", so a missing day can never p
 
 ### Getting the data
 
-1. Log in to Kaggle and download `city_day.csv` from the dataset page, or run
-   `kaggle datasets download -d rohanrao/air-quality-data-in-india`
-2. Place the file at `data/raw/city_day.csv`.
-3. Never commit `kaggle.json` or the raw data (both are in `.gitignore`).
+1. Log in to Kaggle and open the dataset page:
+   https://www.kaggle.com/datasets/rohanrao/air-quality-data-in-india
+2. Click **Download**, then **Download dataset as zip**. The file is saved as `archive.zip`.
+3. Unzip it. It contains several CSV files. **Only `city_day.csv` is used** in this project; the others (for example `city_hour.csv` and `station_day.csv`) are not.
+4. Create the folder `data/raw/` in the project root and copy `city_day.csv` into it, so the path is `data/raw/city_day.csv`.
+5. Alternatively, with the Kaggle CLI: `kaggle datasets download -d rohanrao/air-quality-data-in-india`, then unzip as above.
+6. Never commit `kaggle.json` or the raw data (both are in `.gitignore`).
 
 ## How it works
 
