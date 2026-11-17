@@ -33,7 +33,6 @@
 - **Debugging:** helped investigate errors, import issues, warnings and compatibility problems.
 - **Concepts:** explained data leakage, embargo days, Platt scaling, probability calibration and temporal validation.
 - **Documentation:** helped with the README, website wording and this disclosure.
-- **Review and edits:** helped us understand the full project, checked the website against the course rubric, and edited the website files (an extra threshold slider, removal of duplicated and unused code, and shorter explanations).
 
 ## What we did ourselves
 
